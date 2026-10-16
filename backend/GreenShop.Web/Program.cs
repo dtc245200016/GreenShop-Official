@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using GreenShop.Web.Data;
 using System.Net;
+using Prometheus;
+using GreenShop.Web.Services;
 using System.Net.Sockets;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
@@ -13,6 +15,9 @@ using System.Threading.RateLimiting;
 if(await GreenShop.Web.Services.DeploymentCommands.TryRunAsync(args))return;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Logging.ClearProviders();
+builder.Logging.AddJsonConsole(o => { o.IncludeScopes=true; o.UseUtcTimestamp=true; o.TimestampFormat="yyyy-MM-ddTHH:mm:ss.fffZ"; });
+builder.Services.AddSingleton<Observability>();
 
 // Cấu hình Database Context MySQL
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -113,6 +118,16 @@ builder.Services.AddHttpClient<GreenShop.Web.Services.IAiChatProvider,GreenShop.
     .ConfigurePrimaryHttpMessageHandler(()=>new HttpClientHandler{AllowAutoRedirect=false});
 builder.Services.AddSignalR(o=>{o.MaximumReceiveMessageSize=4096;o.EnableDetailedErrors=false;});
 var app = builder.Build();
+var observability=app.Services.GetRequiredService<Observability>();
+// Fail closed even if Nginx is bypassed. Scrapes never enter customer authentication.
+app.Use(async (context,next) => {
+    if(context.Request.Path.StartsWithSegments("/metrics")) {
+        if(!observability.CanScrape(context)) { context.Response.StatusCode=404; return; }
+    }
+    await next(context);
+});
+app.Use(Observability.Observe);
+app.MapMetrics("/metrics").AllowAnonymous();
 
 // Tra Docker DNS theo request để chỉ tin Nginx, kể cả khi proxy được recreate.
 var loggerFactory = app.Services.GetRequiredService<ILoggerFactory>();

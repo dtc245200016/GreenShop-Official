@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GreenShop.Web.Services;
 
-public class UserSession(AppDbContext db) : CookieAuthenticationEvents
+public class UserSession(AppDbContext db, Observability observability) : CookieAuthenticationEvents
 {
     public const string VersionClaim = "GreenShop.SessionVersion";
     public const string UnavailableItem = "GreenShop.AuthenticationUnavailable";
@@ -71,6 +71,11 @@ public class UserSession(AppDbContext db) : CookieAuthenticationEvents
             context.RejectPrincipal();
             await context.HttpContext.SignOutAsync(context.Scheme.Name);
         }
+    }
+    public override Task RedirectToAccessDenied(RedirectContext<CookieAuthenticationOptions> context)
+    {
+        observability.AccessDenied(context.HttpContext,"role_forbidden");
+        return base.RedirectToAccessDenied(context);
     }
     private record UserAccount(bool IsActive, UserRole Role, long SessionVersion, string FullName, string Email);
 }

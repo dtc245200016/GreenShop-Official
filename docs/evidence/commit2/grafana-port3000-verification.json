@@ -1,0 +1,774 @@
+{
+  "time": "2026-10-16T15:46:18.298863+00:00",
+  "status": "PASS",
+  "scope": "Grafana access standardization; existing Main and QA only",
+  "source_port_13000": false,
+  "main_canonical_url": "http://localhost:3000/",
+  "main_binding": "127.0.0.1:3000:3000",
+  "prometheus_binding": "127.0.0.1:9090:9090",
+  "primary_access": "VS Code Remote SSH / PORTS / forward 3000 and 9090; use actual Forwarded Address",
+  "windows_client_verification": "Operator reports VS Code port 3000 works. Windows client forwarding/session not independently observable from this VM.",
+  "main_runtime_update": {
+    "status": "PASS",
+    "time": "2026-10-16T15:43:14.456648+00:00",
+    "only_runtime_delta": "grafana.environment.GF_SERVER_ROOT_URL: localhost:1300 -> localhost:3000",
+    "grafana_only_recreated": true,
+    "host_binding": "127.0.0.1:3000:3000",
+    "backup": "Private offline Grafana data tar; SQLite integrity_check=ok; original runtime plan and API metadata retained outside Git",
+    "rollback": "Restore private compose-before.json to authoritative Main plan; up only Grafana with --no-deps; preserve existing volume. Offline data backup available if separately required.",
+    "main_application_db_uploads_keys_tls_and_container_ids_unchanged": true,
+    "grafana_persisted_configuration_unchanged": true,
+    "password_changed": false
+  },
+  "qa_monitoring": {
+    "status": "PASS",
+    "time": "2026-10-16T15:44:29.351352+00:00",
+    "project": "greenshop-m2-qa",
+    "host_port": 21300,
+    "grafana_auth": "authenticated API and real Chromium form; anonymous/default rejected",
+    "dashboards": 3,
+    "rules": 4,
+    "evaluated_rules": [
+      {
+        "name": "GreenShopSuspiciousLoginFailures",
+        "state": "inactive",
+        "health": "ok"
+      },
+      {
+        "name": "GreenShopWebDown",
+        "state": "inactive",
+        "health": "ok"
+      },
+      {
+        "name": "GreenShopMySQLDown",
+        "state": "inactive",
+        "health": "ok"
+      },
+      {
+        "name": "GreenShopHighHttp5xxRate",
+        "state": "inactive",
+        "health": "ok"
+      }
+    ],
+    "persisted_configuration_unchanged": true,
+    "targets": [
+      {
+        "job": "cadvisor",
+        "health": "up"
+      },
+      {
+        "job": "greenshop",
+        "health": "up"
+      },
+      {
+        "job": "mysql",
+        "health": "up"
+      },
+      {
+        "job": "nginx",
+        "health": "up"
+      },
+      {
+        "job": "prometheus",
+        "health": "up"
+      }
+    ],
+    "panels": [
+      {
+        "dashboard": "greenshop-security",
+        "panel": "Failed Login Attempts — process lifetime",
+        "series": 1
+      },
+      {
+        "dashboard": "greenshop-security",
+        "panel": "Successful Logins — process lifetime",
+        "series": 1
+      },
+      {
+        "dashboard": "greenshop-security",
+        "panel": "Failed Login Attempts — Last 1 Minute (exact process window)",
+        "series": 1
+      },
+      {
+        "dashboard": "greenshop-security",
+        "panel": "Failed Login Attempts — Last 5 Minutes (sampled estimate)",
+        "series": 1
+      },
+      {
+        "dashboard": "greenshop-security",
+        "panel": "Authentication Failure Trend",
+        "series": 1
+      },
+      {
+        "dashboard": "greenshop-security",
+        "panel": "Security Condition — GS-SEC-001",
+        "series": 1
+      },
+      {
+        "dashboard": "greenshop-security",
+        "panel": "Authorization Denied Events",
+        "series": 1
+      },
+      {
+        "dashboard": "greenshop-security",
+        "panel": "Recent Failures (exact) and Detection Window",
+        "series": 1
+      },
+      {
+        "dashboard": "greenshop-infrastructure",
+        "panel": "Overall Service Status",
+        "series": 5
+      },
+      {
+        "dashboard": "greenshop-infrastructure",
+        "panel": "Container CPU Usage",
+        "series": 10
+      },
+      {
+        "dashboard": "greenshop-infrastructure",
+        "panel": "Container Memory Usage",
+        "series": 10
+      },
+      {
+        "dashboard": "greenshop-infrastructure",
+        "panel": "Container Network Traffic",
+        "series": 10
+      },
+      {
+        "dashboard": "greenshop-infrastructure",
+        "panel": "Container Availability — seconds since last seen",
+        "series": 10
+      },
+      {
+        "dashboard": "greenshop-infrastructure",
+        "panel": "Nginx Connections",
+        "series": 1
+      },
+      {
+        "dashboard": "greenshop-infrastructure",
+        "panel": "MySQL Availability",
+        "series": 1
+      },
+      {
+        "dashboard": "greenshop-infrastructure",
+        "panel": "MySQL Connections",
+        "series": 1
+      },
+      {
+        "dashboard": "greenshop-infrastructure",
+        "panel": "Nginx Reading / Writing / Waiting",
+        "series": 3
+      },
+      {
+        "dashboard": "greenshop-application",
+        "panel": "HTTP Requests Per Second",
+        "series": 1
+      },
+      {
+        "dashboard": "greenshop-application",
+        "panel": "HTTP Response Duration P50",
+        "series": 1
+      },
+      {
+        "dashboard": "greenshop-application",
+        "panel": "HTTP Response Duration P95",
+        "series": 1
+      },
+      {
+        "dashboard": "greenshop-application",
+        "panel": "HTTP Error Rate (4xx + 5xx)",
+        "series": 1
+      },
+      {
+        "dashboard": "greenshop-application",
+        "panel": "HTTP 4xx Rate",
+        "series": 1
+      },
+      {
+        "dashboard": "greenshop-application",
+        "panel": "HTTP 5xx Rate",
+        "series": 1
+      },
+      {
+        "dashboard": "greenshop-application",
+        "panel": "Request Distribution by Safe Group",
+        "series": 7
+      },
+      {
+        "dashboard": "greenshop-application",
+        "panel": "MySQL Active Threads",
+        "series": 1
+      },
+      {
+        "dashboard": "greenshop-application",
+        "panel": "MySQL Queries",
+        "series": 1
+      },
+      {
+        "dashboard": "greenshop-application",
+        "panel": "Application Availability",
+        "series": 1
+      },
+      {
+        "dashboard": "greenshop-application",
+        "panel": "Nginx Requests",
+        "series": 1
+      }
+    ],
+    "website_routes": {
+      "/": 200,
+      "/health/ready": 200,
+      "/SanPham/CuaHang": 200,
+      "/Account/Login": 200,
+      "/Admin/Account/Login": 200
+    },
+    "public_metrics_blocked": true
+  },
+  "main_monitoring": {
+    "status": "PASS",
+    "time": "2026-10-16T15:44:30.726547+00:00",
+    "project": "dtc245200016_btl_tkqt_htpm",
+    "host_port": 3000,
+    "grafana_auth": "authenticated API and real Chromium form; anonymous/default rejected",
+    "dashboards": 3,
+    "rules": 4,
+    "evaluated_rules": [
+      {
+        "name": "GreenShopSuspiciousLoginFailures",
+        "state": "inactive",
+        "health": "ok"
+      },
+      {
+        "name": "GreenShopWebDown",
+        "state": "inactive",
+        "health": "ok"
+      },
+      {
+        "name": "GreenShopMySQLDown",
+        "state": "inactive",
+        "health": "ok"
+      },
+      {
+        "name": "GreenShopHighHttp5xxRate",
+        "state": "inactive",
+        "health": "ok"
+      }
+    ],
+    "persisted_configuration_unchanged": true,
+    "targets": [
+      {
+        "job": "cadvisor",
+        "health": "up"
+      },
+      {
+        "job": "greenshop",
+        "health": "up"
+      },
+      {
+        "job": "mysql",
+        "health": "up"
+      },
+      {
+        "job": "nginx",
+        "health": "up"
+      },
+      {
+        "job": "prometheus",
+        "health": "up"
+      }
+    ],
+    "panels": [
+      {
+        "dashboard": "greenshop-security",
+        "panel": "Failed Login Attempts — process lifetime",
+        "series": 1
+      },
+      {
+        "dashboard": "greenshop-security",
+        "panel": "Successful Logins — process lifetime",
+        "series": 1
+      },
+      {
+        "dashboard": "greenshop-security",
+        "panel": "Failed Login Attempts — Last 1 Minute (exact process window)",
+        "series": 1
+      },
+      {
+        "dashboard": "greenshop-security",
+        "panel": "Failed Login Attempts — Last 5 Minutes (sampled estimate)",
+        "series": 1
+      },
+      {
+        "dashboard": "greenshop-security",
+        "panel": "Authentication Failure Trend",
+        "series": 1
+      },
+      {
+        "dashboard": "greenshop-security",
+        "panel": "Security Condition — GS-SEC-001",
+        "series": 1
+      },
+      {
+        "dashboard": "greenshop-security",
+        "panel": "Authorization Denied Events",
+        "series": 1
+      },
+      {
+        "dashboard": "greenshop-security",
+        "panel": "Recent Failures (exact) and Detection Window",
+        "series": 1
+      },
+      {
+        "dashboard": "greenshop-infrastructure",
+        "panel": "Overall Service Status",
+        "series": 5
+      },
+      {
+        "dashboard": "greenshop-infrastructure",
+        "panel": "Container CPU Usage",
+        "series": 10
+      },
+      {
+        "dashboard": "greenshop-infrastructure",
+        "panel": "Container Memory Usage",
+        "series": 10
+      },
+      {
+        "dashboard": "greenshop-infrastructure",
+        "panel": "Container Network Traffic",
+        "series": 10
+      },
+      {
+        "dashboard": "greenshop-infrastructure",
+        "panel": "Container Availability — seconds since last seen",
+        "series": 10
+      },
+      {
+        "dashboard": "greenshop-infrastructure",
+        "panel": "Nginx Connections",
+        "series": 1
+      },
+      {
+        "dashboard": "greenshop-infrastructure",
+        "panel": "MySQL Availability",
+        "series": 1
+      },
+      {
+        "dashboard": "greenshop-infrastructure",
+        "panel": "MySQL Connections",
+        "series": 1
+      },
+      {
+        "dashboard": "greenshop-infrastructure",
+        "panel": "Nginx Reading / Writing / Waiting",
+        "series": 3
+      },
+      {
+        "dashboard": "greenshop-application",
+        "panel": "HTTP Requests Per Second",
+        "series": 1
+      },
+      {
+        "dashboard": "greenshop-application",
+        "panel": "HTTP Response Duration P50",
+        "series": 1
+      },
+      {
+        "dashboard": "greenshop-application",
+        "panel": "HTTP Response Duration P95",
+        "series": 1
+      },
+      {
+        "dashboard": "greenshop-application",
+        "panel": "HTTP Error Rate (4xx + 5xx)",
+        "series": 1
+      },
+      {
+        "dashboard": "greenshop-application",
+        "panel": "HTTP 4xx Rate",
+        "series": 1
+      },
+      {
+        "dashboard": "greenshop-application",
+        "panel": "HTTP 5xx Rate",
+        "series": 1
+      },
+      {
+        "dashboard": "greenshop-application",
+        "panel": "Request Distribution by Safe Group",
+        "series": 6
+      },
+      {
+        "dashboard": "greenshop-application",
+        "panel": "MySQL Active Threads",
+        "series": 1
+      },
+      {
+        "dashboard": "greenshop-application",
+        "panel": "MySQL Queries",
+        "series": 1
+      },
+      {
+        "dashboard": "greenshop-application",
+        "panel": "Application Availability",
+        "series": 1
+      },
+      {
+        "dashboard": "greenshop-application",
+        "panel": "Nginx Requests",
+        "series": 1
+      }
+    ],
+    "website_routes": {
+      "/": 200,
+      "/health/ready": 200,
+      "/SanPham/CuaHang": 200,
+      "/Account/Login": 200,
+      "/Admin/Account/Login": 200
+    },
+    "public_metrics_blocked": true
+  },
+  "qa_security": {
+    "status": "PASS",
+    "time": "2026-10-16T15:40:54.318125+00:00",
+    "checks": [
+      "Customer/Admin actual sign-in",
+      "Customer Admin route denied",
+      "missing CSRF rejected",
+      "four credential rejections remain Normal",
+      "fifth in 60 seconds causes Firing",
+      "real firing and resolved webhook delivered",
+      "automatic Normal recovery"
+    ],
+    "boundary": {
+      "status": "PASS",
+      "time": "2026-10-16T15:40:21.617133+00:00",
+      "start": "2026-10-16T15:39:28.668884+00:00",
+      "seconds_to_fifth_rejection": 15.576798411999334,
+      "four_failures_rule": {
+        "state": "inactive",
+        "name": "GreenShopSuspiciousLoginFailures",
+        "query": "sum(greenshop_auth_login_failures_last_60s) >= bool 5",
+        "queriedDatasourceUIDs": [
+          "greenshop-prometheus"
+        ],
+        "annotations": {
+          "__dashboardUid__": "greenshop-security",
+          "__panelId__": "3",
+          "description": "At least 5 rejected credential checks in a rolling 60s window. Suspected password guessing; no claim of compromise.",
+          "investigation": "Use UTC and request_id in stdout JSON events. Commit 3 will collect auth.login.failed in Loki; no LogQL is configured yet.",
+          "runbook_url": "/d/greenshop-security",
+          "summary": "GreenShopSuspiciousLoginFailures"
+        },
+        "alerts": [
+          {
+            "labels": {
+              "alertname": "GreenShopSuspiciousLoginFailures",
+              "category": "security",
+              "grafana_folder": "GreenShop Alerts",
+              "incident": "GS-SEC-001",
+              "project": "greenshop",
+              "severity": "warning"
+            },
+            "annotations": {
+              "__dashboardUid__": "greenshop-security",
+              "__panelId__": "3",
+              "description": "At least 5 rejected credential checks in a rolling 60s window. Suspected password guessing; no claim of compromise.",
+              "investigation": "Use UTC and request_id in stdout JSON events. Commit 3 will collect auth.login.failed in Loki; no LogQL is configured yet.",
+              "runbook_url": "/d/greenshop-security",
+              "summary": "GreenShopSuspiciousLoginFailures"
+            },
+            "state": "Normal",
+            "activeAt": "2026-10-16T13:58:50Z",
+            "value": ""
+          }
+        ],
+        "totals": {
+          "normal": 1
+        },
+        "totalsFiltered": {
+          "normal": 1
+        },
+        "uid": "gs-sec-001",
+        "folderUid": "fg1elz9da8cn4e",
+        "labels": {
+          "category": "security",
+          "incident": "GS-SEC-001",
+          "project": "greenshop",
+          "severity": "warning"
+        },
+        "health": "ok",
+        "type": "alerting",
+        "lastEvaluation": "2026-10-16T15:39:30Z",
+        "evaluationTime": 0.003425001,
+        "isPaused": false,
+        "provenance": "file"
+      },
+      "five_failures_rule": {
+        "state": "firing",
+        "name": "GreenShopSuspiciousLoginFailures",
+        "query": "sum(greenshop_auth_login_failures_last_60s) >= bool 5",
+        "queriedDatasourceUIDs": [
+          "greenshop-prometheus"
+        ],
+        "annotations": {
+          "__dashboardUid__": "greenshop-security",
+          "__panelId__": "3",
+          "description": "At least 5 rejected credential checks in a rolling 60s window. Suspected password guessing; no claim of compromise.",
+          "investigation": "Use UTC and request_id in stdout JSON events. Commit 3 will collect auth.login.failed in Loki; no LogQL is configured yet.",
+          "runbook_url": "/d/greenshop-security",
+          "summary": "GreenShopSuspiciousLoginFailures"
+        },
+        "activeAt": "2026-10-16T15:40:00Z",
+        "alerts": [
+          {
+            "labels": {
+              "alertname": "GreenShopSuspiciousLoginFailures",
+              "category": "security",
+              "grafana_folder": "GreenShop Alerts",
+              "incident": "GS-SEC-001",
+              "project": "greenshop",
+              "severity": "warning"
+            },
+            "annotations": {
+              "__dashboardUid__": "greenshop-security",
+              "__panelId__": "3",
+              "description": "At least 5 rejected credential checks in a rolling 60s window. Suspected password guessing; no claim of compromise.",
+              "investigation": "Use UTC and request_id in stdout JSON events. Commit 3 will collect auth.login.failed in Loki; no LogQL is configured yet.",
+              "runbook_url": "/d/greenshop-security",
+              "summary": "GreenShopSuspiciousLoginFailures"
+            },
+            "state": "Alerting",
+            "activeAt": "2026-10-16T15:40:00Z",
+            "value": "1e+00"
+          }
+        ],
+        "totals": {
+          "alerting": 1
+        },
+        "totalsFiltered": {
+          "alerting": 1
+        },
+        "uid": "gs-sec-001",
+        "folderUid": "fg1elz9da8cn4e",
+        "labels": {
+          "category": "security",
+          "incident": "GS-SEC-001",
+          "project": "greenshop",
+          "severity": "warning"
+        },
+        "health": "ok",
+        "type": "alerting",
+        "lastEvaluation": "2026-10-16T15:40:00Z",
+        "evaluationTime": 0.003264724,
+        "isPaused": false,
+        "provenance": "file"
+      },
+      "counter_delta": 5,
+      "notification": {
+        "received_at": "2026-10-16T15:40:08.201655+00:00",
+        "payload": {
+          "receiver": "GreenShop Security Alerts",
+          "status": "firing",
+          "alerts": [
+            {
+              "status": "firing",
+              "labels": {
+                "alertname": "GreenShopSuspiciousLoginFailures",
+                "category": "security",
+                "grafana_folder": "GreenShop Alerts",
+                "incident": "GS-SEC-001",
+                "project": "greenshop",
+                "severity": "warning"
+              },
+              "annotations": {
+                "description": "At least 5 rejected credential checks in a rolling 60s window. Suspected password guessing; no claim of compromise.",
+                "investigation": "Use UTC and request_id in stdout JSON events. Commit 3 will collect auth.login.failed in Loki; no LogQL is configured yet.",
+                "runbook_url": "/d/greenshop-security",
+                "summary": "GreenShopSuspiciousLoginFailures"
+              },
+              "startsAt": "2026-10-16T15:40:00Z",
+              "endsAt": "0001-01-01T00:00:00Z",
+              "generatorURL": "http://localhost:21300/alerting/grafana/gs-sec-001/view?orgId=1",
+              "fingerprint": "5dac3f12a4a0c5f8",
+              "silenceURL": "http://localhost:21300/alerting/silence/new?alertmanager=grafana&matcher=__alert_rule_uid__%3Dgs-sec-001&matcher=category%3Dsecurity&matcher=incident%3DGS-SEC-001&matcher=project%3Dgreenshop&matcher=severity%3Dwarning&orgId=1",
+              "dashboardURL": "http://localhost:21300/d/greenshop-security?from=1792161600000&orgId=1&to=1792165205033",
+              "panelURL": "http://localhost:21300/d/greenshop-security?from=1792161600000&orgId=1&to=1792165205033&viewPanel=3",
+              "ruleUID": "gs-sec-001",
+              "values": {
+                "A": 1,
+                "C": 1
+              },
+              "valueString": "[ var='A' labels={} type='query' value=1 ], [ var='C' labels={} type='threshold' value=1 ]",
+              "orgId": 1
+            }
+          ],
+          "groupLabels": {
+            "alertname": "GreenShopSuspiciousLoginFailures",
+            "incident": "GS-SEC-001"
+          },
+          "commonLabels": {
+            "alertname": "GreenShopSuspiciousLoginFailures",
+            "category": "security",
+            "grafana_folder": "GreenShop Alerts",
+            "incident": "GS-SEC-001",
+            "project": "greenshop",
+            "severity": "warning"
+          },
+          "commonAnnotations": {
+            "description": "At least 5 rejected credential checks in a rolling 60s window. Suspected password guessing; no claim of compromise.",
+            "investigation": "Use UTC and request_id in stdout JSON events. Commit 3 will collect auth.login.failed in Loki; no LogQL is configured yet.",
+            "runbook_url": "/d/greenshop-security",
+            "summary": "GreenShopSuspiciousLoginFailures"
+          },
+          "externalURL": "http://localhost:21300/",
+          "appVersion": "13.2.4",
+          "version": "1",
+          "groupKey": "{}:{alertname=\"GreenShopSuspiciousLoginFailures\", incident=\"GS-SEC-001\"}",
+          "truncatedAlerts": 0,
+          "orgId": 1,
+          "title": "GreenShop alert firing",
+          "state": "alerting",
+          "message": "name=GreenShopSuspiciousLoginFailures severity=warning incident=GS-SEC-001 status=firing startsAt=2026-10-16 15:40:00 +0000 UTC summary=GreenShopSuspiciousLoginFailures grafana=http://localhost:21300/alerting/grafana/gs-sec-001/view?orgId=1"
+        }
+      }
+    },
+    "main_account_writes": false,
+    "resolved_notification": {
+      "received_at": "2026-10-16T15:40:45.042574+00:00",
+      "payload": {
+        "receiver": "GreenShop Security Alerts",
+        "status": "resolved",
+        "alerts": [
+          {
+            "status": "resolved",
+            "labels": {
+              "alertname": "GreenShopSuspiciousLoginFailures",
+              "category": "security",
+              "grafana_folder": "GreenShop Alerts",
+              "incident": "GS-SEC-001",
+              "project": "greenshop",
+              "severity": "warning"
+            },
+            "annotations": {
+              "description": "At least 5 rejected credential checks in a rolling 60s window. Suspected password guessing; no claim of compromise.",
+              "investigation": "Use UTC and request_id in stdout JSON events. Commit 3 will collect auth.login.failed in Loki; no LogQL is configured yet.",
+              "runbook_url": "/d/greenshop-security",
+              "summary": "GreenShopSuspiciousLoginFailures"
+            },
+            "startsAt": "2026-10-16T15:40:00Z",
+            "endsAt": "2026-10-16T15:40:40Z",
+            "generatorURL": "http://localhost:21300/alerting/grafana/gs-sec-001/view?orgId=1",
+            "fingerprint": "5dac3f12a4a0c5f8",
+            "silenceURL": "http://localhost:21300/alerting/silence/new?alertmanager=grafana&matcher=__alert_rule_uid__%3Dgs-sec-001&matcher=category%3Dsecurity&matcher=incident%3DGS-SEC-001&matcher=project%3Dgreenshop&matcher=severity%3Dwarning&orgId=1",
+            "dashboardURL": "http://localhost:21300/d/greenshop-security?from=1792161600000&orgId=1&to=1792165240000",
+            "panelURL": "http://localhost:21300/d/greenshop-security?from=1792161600000&orgId=1&to=1792165240000&viewPanel=3",
+            "ruleUID": "gs-sec-001",
+            "values": {
+              "A": 0,
+              "C": 0
+            },
+            "valueString": "[ var='A' labels={} type='query' value=0 ], [ var='C' labels={} type='threshold' value=0 ]",
+            "orgId": 1
+          }
+        ],
+        "groupLabels": {
+          "alertname": "GreenShopSuspiciousLoginFailures",
+          "incident": "GS-SEC-001"
+        },
+        "commonLabels": {
+          "alertname": "GreenShopSuspiciousLoginFailures",
+          "category": "security",
+          "grafana_folder": "GreenShop Alerts",
+          "incident": "GS-SEC-001",
+          "project": "greenshop",
+          "severity": "warning"
+        },
+        "commonAnnotations": {
+          "description": "At least 5 rejected credential checks in a rolling 60s window. Suspected password guessing; no claim of compromise.",
+          "investigation": "Use UTC and request_id in stdout JSON events. Commit 3 will collect auth.login.failed in Loki; no LogQL is configured yet.",
+          "runbook_url": "/d/greenshop-security",
+          "summary": "GreenShopSuspiciousLoginFailures"
+        },
+        "externalURL": "http://localhost:21300/",
+        "appVersion": "13.2.4",
+        "version": "1",
+        "groupKey": "{}:{alertname=\"GreenShopSuspiciousLoginFailures\", incident=\"GS-SEC-001\"}",
+        "truncatedAlerts": 0,
+        "orgId": 1,
+        "title": "GreenShop alert resolved",
+        "state": "ok",
+        "message": "name=GreenShopSuspiciousLoginFailures severity=warning incident=GS-SEC-001 status=resolved startsAt=2026-10-16 15:40:00 +0000 UTC summary=GreenShopSuspiciousLoginFailures grafana=http://localhost:21300/alerting/grafana/gs-sec-001/view?orgId=1"
+      }
+    }
+  },
+  "qa_persistence": {
+    "status": "PASS",
+    "time": "2026-10-16T15:37:37.164622+00:00",
+    "checks": [
+      "Grafana/Prometheus restarted",
+      "3 dashboard UIDs retained",
+      "4 provisioned rules retained",
+      "TSDB historical series retained",
+      "application counter unchanged",
+      "QA MySQL user count unchanged"
+    ]
+  },
+  "preservation": {
+    "status": "PASS",
+    "time": "2026-10-16T15:44:36.845867+00:00",
+    "main_tables_uploads_keys_tls_migrations_and_core_containers_unchanged": true,
+    "same_compose_project_names": true,
+    "same_volume_names": true,
+    "same_container_names": true,
+    "only_recreated_container": [
+      "dtc245200016_btl_tkqt_htpm-grafana-1"
+    ],
+    "main_qa_monitoring_healthy_and_loopback": true,
+    "exporters_receiver_unpublished": true,
+    "historical_evidence_hashes_unchanged": true,
+    "gitignore_private_paths_checked": 16,
+    "safe_source_evidence_exceptions_checked": 3
+  },
+  "configuration_comparison": "Exact persisted UIDs, dashboard metadata, PromQL/conditions, thresholds, contact points/policies/datasources; provisioning timestamps excluded. Historical absolute localhost runbook links compared by path to existing relative source links reloaded on restart.",
+  "documentation_validation": [
+    "local links exist",
+    "Bash code fences parse after replacing documented placeholders",
+    "inline Python syntax valid",
+    "fresh secrets generated silently in temporary private directories",
+    "existing secrets refused unchanged",
+    "environment mode 600; secret directory 700; file-backed metrics token readable by container",
+    "core four-service and all-profile ten-service Compose render valid"
+  ],
+  "fresh_install_runtime": "NOT TESTED: no new project created; isolated configuration/secret generation checks only",
+  "main_customer_admin_login": "NOT TESTED: no safe test credentials; no Main application accounts created, modified, locked or deleted",
+  "security_audit": {
+    "status": "PASS",
+    "time": "2026-10-16T15:48:07.836765+00:00",
+    "scope": "All 80 staged blobs: 64 UTF-8 text files and 16 PNGs, not only added lines or filenames",
+    "secret_scan": "PASS",
+    "sensitive_data_scan": "PASS",
+    "screenshot_review": "PASS",
+    "staged_diff_check": "PASS",
+    "known_secret_and_strong_token_findings": 0,
+    "candidate_classification": "All 12 flags manually reviewed: environment references, config-only placeholder or unchanged withheld-password/access-result descriptions; no live credential value.",
+    "screenshots": "14 original reviewed images unchanged by hash; 2 new images visually reviewed; no sensitive content or PNG metadata chunks. Original blank capture retained with limitation; new genuine Normal-state capture added.",
+    "gitignore": "16 private paths ignored; 3 intended source/evidence exceptions trackable; no runtime credential, database dump, SQLite backup or user-data file staged.",
+    "txt_whitespace": "No staged TXT trailing whitespace; cached check exits 0; no evidence lines changed merely to manufacture a fix."
+  },
+  "no_git_commit_or_push": true,
+  "verdict": {
+    "GRAFANA_PORT_3000": "PASS",
+    "OBSOLETE_PORT_13000_DOCS": "CLEAN",
+    "README_SYNC": "PASS",
+    "MONITORING_README_SYNC": "PASS",
+    "GRAFANA_DASHBOARDS": "PASS",
+    "PROMETHEUS": "PASS",
+    "ALERT_RULES": "PASS",
+    "DATA_PRESERVATION": "PASS",
+    "SECURITY_AUDIT": "PASS",
+    "GIT_DIFF_CHECK": "PASS",
+    "COMMIT_2_READY": "YES"
+  },
+  "staged_files": 80
+}

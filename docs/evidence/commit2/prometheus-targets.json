@@ -1,0 +1,55 @@
+{
+  "timestamp": "2026-10-16T13:32:53.949091+00:00",
+  "targets": [
+    {
+      "labels": {
+        "instance": "cadvisor:8080",
+        "job": "cadvisor"
+      },
+      "health": "up",
+      "lastError": "",
+      "lastScrape": "2026-10-16T13:32:47.19301298Z",
+      "scrapeUrl": "http://cadvisor:8080/metrics"
+    },
+    {
+      "labels": {
+        "instance": "web_app:8080",
+        "job": "greenshop"
+      },
+      "health": "up",
+      "lastError": "",
+      "lastScrape": "2026-10-16T13:32:50.092776748Z",
+      "scrapeUrl": "http://web_app:8080/metrics"
+    },
+    {
+      "labels": {
+        "instance": "mysql-exporter:9104",
+        "job": "mysql"
+      },
+      "health": "up",
+      "lastError": "",
+      "lastScrape": "2026-10-16T13:32:50.723828692Z",
+      "scrapeUrl": "http://mysql-exporter:9104/metrics"
+    },
+    {
+      "labels": {
+        "instance": "nginx-exporter:9113",
+        "job": "nginx"
+      },
+      "health": "up",
+      "lastError": "",
+      "lastScrape": "2026-10-16T13:32:46.602164202Z",
+      "scrapeUrl": "http://nginx-exporter:9113/metrics"
+    },
+    {
+      "labels": {
+        "instance": "prometheus:9090",
+        "job": "prometheus"
+      },
+      "health": "up",
+      "lastError": "",
+      "lastScrape": "2026-10-16T13:32:50.619845834Z",
+      "scrapeUrl": "http://prometheus:9090/metrics"
+    }
+  ]
+}

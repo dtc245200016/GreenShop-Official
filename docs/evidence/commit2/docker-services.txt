@@ -1,0 +1,27 @@
+Actual Docker runtime; captured 2026-10-16T21:04:07.608294+07:00
+dtc245200016_btl_tkqt_htpm-grafana-1	grafana/grafana:13.2.4	Up 11 minutes (healthy)	127.0.0.1:3000->3000/tcp
+dtc245200016_btl_tkqt_htpm-prometheus-1	prom/prometheus:v3.15.0	Up 11 minutes (healthy)	127.0.0.1:9090->9090/tcp
+dtc245200016_btl_tkqt_htpm-nginx-exporter-1	nginx/nginx-prometheus-exporter:1.5.3	Up 11 minutes
+greenshop-main-qa-alert-receiver	python:3.12.10-alpine3.21	Up 11 minutes
+dtc245200016_btl_tkqt_htpm-cadvisor-1	ghcr.io/google/cadvisor:0.60.6	Up 11 minutes (healthy)	8080/tcp
+dtc245200016_btl_tkqt_htpm-mysql-exporter-1	prom/mysqld-exporter:v0.20.0	Up 11 minutes	9104/tcp
+nginx_server	nginx:alpine	Up 11 minutes (healthy)	0.0.0.0:80->80/tcp, [::]:80->80/tcp, 0.0.0.0:443->443/tcp, [::]:443->443/tcp
+greenshop_web	greenshop-m2-web:release	Up 11 minutes (healthy)	127.0.0.1:5000->8080/tcp
+greenshop-m2-qa-web_app-1	greenshop-m2-web:qa	Up 15 minutes (healthy)	8080/tcp
+greenshop-m2-qa-grafana-1	grafana/grafana:13.2.4	Up 6 minutes (healthy)	127.0.0.1:21300->3000/tcp
+greenshop-m2-qa-prometheus-1	prom/prometheus:v3.15.0	Up 19 minutes (healthy)	127.0.0.1:21990->9090/tcp
+greenshop-m2-qa-nginx-1	nginx:alpine	Up 34 minutes (healthy)	80/tcp, 127.0.0.1:21543->443/tcp
+greenshop-m2-qa-qa-alert-receiver-1	python:3.12.10-alpine3.21	Up 34 minutes
+greenshop-m2-qa-nginx-exporter-1	nginx/nginx-prometheus-exporter:1.5.3	Up 34 minutes
+greenshop-m2-qa-cadvisor-1	ghcr.io/google/cadvisor:0.60.6	Up 34 minutes (healthy)	8080/tcp
+greenshop-m2-qa-mysql-exporter-1	prom/mysqld-exporter:v0.20.0	Up 34 minutes	9104/tcp
+greenshop-m2-qa-phpmyadmin-1	42a200db07b4	Up 34 minutes (healthy)	80/tcp
+greenshop-m2-qa-db-1	mysql:8.0	Up 13 minutes (healthy)	3306/tcp, 33060/tcp
+greenshop-release-qa-04c44ccd59-web_app-1	greenshop-release-qa-04c44ccd59-web:release	Up 3 hours (healthy)	8080/tcp
+greenshop-release-qa-04c44ccd59-db-1	mysql:8.0	Up 3 hours (healthy)	3306/tcp, 33060/tcp
+greenshop-release-qa-04c44ccd59-phpmyadmin-1	42a200db07b4	Up 3 hours (healthy)	127.0.0.1:18580->80/tcp
+greenshop-release-qa-341da3f2f2-web_app-1	greenshop-release-qa-341da3f2f2-web:release	Up 3 hours (healthy)	8080/tcp
+greenshop-release-qa-341da3f2f2-db-1	mysql:8.0	Up 3 hours (healthy)	3306/tcp, 33060/tcp
+greenshop-release-qa-341da3f2f2-phpmyadmin-1	42a200db07b4	Up 3 hours (healthy)	127.0.0.1:20580->80/tcp
+greenshop_phpmyadmin	phpmyadmin/phpmyadmin	Up 3 hours (healthy)	127.0.0.1:8080->80/tcp
+greenshop_db	mysql:8.0	Up 3 hours (healthy)	127.0.0.1:3306->3306/tcp, 33060/tcp

@@ -1,0 +1,155 @@
+{
+  "status": "PASS",
+  "timestamp": "2026-10-16T13:32:54.352162+00:00",
+  "checks": [
+    "five targets UP",
+    "actual application, container, nginx and MySQL metric families",
+    "Grafana auth rejects anonymous/default credentials",
+    "Prometheus datasource health OK",
+    "3 dashboards / 4 provisioned alerts",
+    "public metrics and stub_status blocked",
+    "QA readiness 200"
+  ],
+  "panels": [
+    {
+      "dashboard": "greenshop-security",
+      "panel": "Failed Login Attempts — process lifetime",
+      "series": 1
+    },
+    {
+      "dashboard": "greenshop-security",
+      "panel": "Successful Logins — process lifetime",
+      "series": 1
+    },
+    {
+      "dashboard": "greenshop-security",
+      "panel": "Failed Login Attempts — Last 1 Minute (exact process window)",
+      "series": 1
+    },
+    {
+      "dashboard": "greenshop-security",
+      "panel": "Failed Login Attempts — Last 5 Minutes (sampled estimate)",
+      "series": 1
+    },
+    {
+      "dashboard": "greenshop-security",
+      "panel": "Authentication Failure Trend",
+      "series": 1
+    },
+    {
+      "dashboard": "greenshop-security",
+      "panel": "Security Condition — GS-SEC-001",
+      "series": 1
+    },
+    {
+      "dashboard": "greenshop-security",
+      "panel": "Authorization Denied Events",
+      "series": 1
+    },
+    {
+      "dashboard": "greenshop-security",
+      "panel": "Recent Failures (exact) and Detection Window",
+      "series": 1
+    },
+    {
+      "dashboard": "greenshop-infrastructure",
+      "panel": "Overall Service Status",
+      "series": 5
+    },
+    {
+      "dashboard": "greenshop-infrastructure",
+      "panel": "Container CPU Usage",
+      "series": 20
+    },
+    {
+      "dashboard": "greenshop-infrastructure",
+      "panel": "Container Memory Usage",
+      "series": 10
+    },
+    {
+      "dashboard": "greenshop-infrastructure",
+      "panel": "Container Network Traffic",
+      "series": 10
+    },
+    {
+      "dashboard": "greenshop-infrastructure",
+      "panel": "Container Availability — seconds since last seen",
+      "series": 10
+    },
+    {
+      "dashboard": "greenshop-infrastructure",
+      "panel": "Nginx Connections",
+      "series": 1
+    },
+    {
+      "dashboard": "greenshop-infrastructure",
+      "panel": "MySQL Availability",
+      "series": 1
+    },
+    {
+      "dashboard": "greenshop-infrastructure",
+      "panel": "MySQL Connections",
+      "series": 1
+    },
+    {
+      "dashboard": "greenshop-infrastructure",
+      "panel": "Nginx Reading / Writing / Waiting",
+      "series": 3
+    },
+    {
+      "dashboard": "greenshop-application",
+      "panel": "HTTP Requests Per Second",
+      "series": 1
+    },
+    {
+      "dashboard": "greenshop-application",
+      "panel": "HTTP Response Duration P50",
+      "series": 1
+    },
+    {
+      "dashboard": "greenshop-application",
+      "panel": "HTTP Response Duration P95",
+      "series": 1
+    },
+    {
+      "dashboard": "greenshop-application",
+      "panel": "HTTP Error Rate (4xx + 5xx)",
+      "series": 1
+    },
+    {
+      "dashboard": "greenshop-application",
+      "panel": "HTTP 4xx Rate",
+      "series": 1
+    },
+    {
+      "dashboard": "greenshop-application",
+      "panel": "HTTP 5xx Rate",
+      "series": 1
+    },
+    {
+      "dashboard": "greenshop-application",
+      "panel": "Request Distribution by Safe Group",
+      "series": 2
+    },
+    {
+      "dashboard": "greenshop-application",
+      "panel": "MySQL Active Threads",
+      "series": 1
+    },
+    {
+      "dashboard": "greenshop-application",
+      "panel": "MySQL Queries",
+      "series": 1
+    },
+    {
+      "dashboard": "greenshop-application",
+      "panel": "Application Availability",
+      "series": 1
+    },
+    {
+      "dashboard": "greenshop-application",
+      "panel": "Nginx Requests",
+      "series": 1
+    }
+  ]
+}

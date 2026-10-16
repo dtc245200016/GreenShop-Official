@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "time": "2026-10-16T13:35:27.863933+00:00",
+  "grants": [
+    "GRANT PROCESS ON *.* TO `greenshop_exporter`@`%`"
+  ],
+  "global_status_read": true,
+  "application_select_denied": true,
+  "application_update_denied": true,
+  "mysql_up": 1.0,
+  "connections": 3.0,
+  "queries": 1241.0
+}

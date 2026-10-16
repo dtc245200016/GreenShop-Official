@@ -1,0 +1,16 @@
+{
+  "status": "PASS",
+  "time": "2026-10-16T14:32:54.277029+00:00",
+  "username": "admin",
+  "password": "Operator-selected password applied through authenticated API; stored only in private secret/metadata files; value withheld.",
+  "login_with_new_password": "PASS",
+  "grafana_health": "PASS",
+  "vm_binding": "127.0.0.1:3000",
+  "browser_url": "http://localhost:1300/",
+  "windows_tunnel": "ssh -N -L 1300:127.0.0.1:3000 trung@192.168.197.128",
+  "dashboard_count": 3,
+  "alert_rules": 4,
+  "runbook_links": "Relative /d/greenshop-security links work with browser port 1300",
+  "secret_scan": "PASS: password absent from Git-visible files",
+  "application_database_volumes": "Not changed by this update"
+}

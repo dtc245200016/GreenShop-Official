@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "time": "2026-10-16T13:44:52.341597+00:00",
+  "checks": [
+    "Grafana/Prometheus restarted",
+    "3 dashboard UIDs retained",
+    "4 provisioned rules retained",
+    "TSDB historical series retained",
+    "application counter unchanged",
+    "QA MySQL user count unchanged"
+  ]
+}

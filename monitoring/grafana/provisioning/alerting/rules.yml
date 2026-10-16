@@ -1,0 +1,225 @@
+apiVersion: 1
+groups:
+- orgId: 1
+  name: GreenShop 10s
+  folder: GreenShop Alerts
+  interval: 10s
+  rules:
+  - uid: gs-sec-001
+    title: GreenShopSuspiciousLoginFailures
+    condition: C
+    for: 0s
+    noDataState: Alerting
+    execErrState: Alerting
+    labels:
+      project: greenshop
+      category: security
+      severity: warning
+      incident: GS-SEC-001
+    annotations:
+      summary: GreenShopSuspiciousLoginFailures
+      description: At least 5 rejected credential checks in a rolling 60s window.
+        Suspected password guessing; no claim of compromise.
+      runbook_url: /d/greenshop-security
+      __dashboardUid__: greenshop-security
+      __panelId__: '3'
+      investigation: Use UTC and request_id in stdout JSON events. Commit 3 will collect
+        auth.login.failed in Loki; no LogQL is configured yet.
+    data:
+    - refId: A
+      relativeTimeRange:
+        from: 120
+        to: 0
+      datasourceUid: greenshop-prometheus
+      model:
+        refId: A
+        expr: sum(greenshop_auth_login_failures_last_60s) >= bool 5
+        instant: true
+        intervalMs: 1000
+        maxDataPoints: 43200
+    - refId: C
+      relativeTimeRange:
+        from: 0
+        to: 0
+      datasourceUid: __expr__
+      model:
+        refId: C
+        type: threshold
+        expression: A
+        conditions:
+        - evaluator:
+            type: gt
+            params:
+            - 0
+          operator:
+            type: and
+          query:
+            params:
+            - C
+          reducer:
+            type: last
+            params: []
+          type: query
+  - uid: gs-web-down
+    title: GreenShopWebDown
+    condition: C
+    for: 20s
+    noDataState: Alerting
+    execErrState: Alerting
+    labels:
+      project: greenshop
+      category: availability
+      severity: warning
+      incident: gs-web-down
+    annotations:
+      summary: GreenShopWebDown
+      description: 'Inspect target health and service logs. Threshold: 1'
+      runbook_url: /d/greenshop-security
+      __dashboardUid__: greenshop-security
+      __panelId__: '3'
+      investigation: Use UTC and request_id in stdout JSON events. Commit 3 will collect
+        auth.login.failed in Loki; no LogQL is configured yet.
+    data:
+    - refId: A
+      relativeTimeRange:
+        from: 120
+        to: 0
+      datasourceUid: greenshop-prometheus
+      model:
+        refId: A
+        expr: up{job="greenshop"}
+        instant: true
+        intervalMs: 1000
+        maxDataPoints: 43200
+    - refId: C
+      relativeTimeRange:
+        from: 0
+        to: 0
+      datasourceUid: __expr__
+      model:
+        refId: C
+        type: threshold
+        expression: A
+        conditions:
+        - evaluator:
+            type: lt
+            params:
+            - 1
+          operator:
+            type: and
+          query:
+            params:
+            - C
+          reducer:
+            type: last
+            params: []
+          type: query
+  - uid: gs-mysql-down
+    title: GreenShopMySQLDown
+    condition: C
+    for: 20s
+    noDataState: Alerting
+    execErrState: Alerting
+    labels:
+      project: greenshop
+      category: availability
+      severity: warning
+      incident: gs-mysql-down
+    annotations:
+      summary: GreenShopMySQLDown
+      description: 'Inspect target health and service logs. Threshold: 1'
+      runbook_url: /d/greenshop-security
+      __dashboardUid__: greenshop-security
+      __panelId__: '3'
+      investigation: Use UTC and request_id in stdout JSON events. Commit 3 will collect
+        auth.login.failed in Loki; no LogQL is configured yet.
+    data:
+    - refId: A
+      relativeTimeRange:
+        from: 120
+        to: 0
+      datasourceUid: greenshop-prometheus
+      model:
+        refId: A
+        expr: mysql_up
+        instant: true
+        intervalMs: 1000
+        maxDataPoints: 43200
+    - refId: C
+      relativeTimeRange:
+        from: 0
+        to: 0
+      datasourceUid: __expr__
+      model:
+        refId: C
+        type: threshold
+        expression: A
+        conditions:
+        - evaluator:
+            type: lt
+            params:
+            - 1
+          operator:
+            type: and
+          query:
+            params:
+            - C
+          reducer:
+            type: last
+            params: []
+          type: query
+  - uid: gs-http-5xx
+    title: GreenShopHighHttp5xxRate
+    condition: C
+    for: 1m
+    noDataState: Alerting
+    execErrState: Alerting
+    labels:
+      project: greenshop
+      category: availability
+      severity: warning
+      incident: gs-http-5xx
+    annotations:
+      summary: GreenShopHighHttp5xxRate
+      description: 'Inspect target health and service logs. Threshold: 0.05'
+      runbook_url: /d/greenshop-security
+      __dashboardUid__: greenshop-security
+      __panelId__: '3'
+      investigation: Use UTC and request_id in stdout JSON events. Commit 3 will collect
+        auth.login.failed in Loki; no LogQL is configured yet.
+    data:
+    - refId: A
+      relativeTimeRange:
+        from: 120
+        to: 0
+      datasourceUid: greenshop-prometheus
+      model:
+        refId: A
+        expr: sum(rate(greenshop_http_requests_total{status_code=~"5.."}[2m])) / clamp_min(sum(rate(greenshop_http_requests_total[2m])),
+          0.001)
+        instant: true
+        intervalMs: 1000
+        maxDataPoints: 43200
+    - refId: C
+      relativeTimeRange:
+        from: 0
+        to: 0
+      datasourceUid: __expr__
+      model:
+        refId: C
+        type: threshold
+        expression: A
+        conditions:
+        - evaluator:
+            type: gt
+            params:
+            - 0.05
+          operator:
+            type: and
+          query:
+            params:
+            - C
+          reducer:
+            type: last
+            params: []
+          type: query

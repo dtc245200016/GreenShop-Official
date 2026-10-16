@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="prometheus-net.AspNetCore" Version="8.2.1" />
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="ClosedXML" Version="0.105.1" />
     <!-- Pin patched .NET 8 transitive dependencies (CVE-2024-43483/30105/43485). -->

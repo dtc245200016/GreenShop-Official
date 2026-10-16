@@ -28,3 +28,28 @@ backups/
 **/__pycache__/
 *.py[cod]
 
+
+# Monitoring runtime material
+.monitoring-private/
+*.sql
+*.sql.gz
+
+# Private runtime credentials (examples must use distinct *.example.* names)
+secrets/
+grafana-password
+metrics-token
+mysql-exporter.cnf
+passwords.json
+credentials.json
+accounts.json
+
+# Private key bundles and additional compressed database dumps
+*.p12
+*.pfx
+id_rsa
+id_ed25519
+*.sql.bz2
+*.sql.xz
+*.sql.zst
+*.dump
+*.dump.gz

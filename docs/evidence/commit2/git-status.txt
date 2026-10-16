@@ -1,0 +1,16 @@
+Branch: main
+HEAD: af1abea9d2013291d2cee53605ae7a85e792657a
+ M .env.example
+ M .gitignore
+ M README.md
+ M backend/GreenShop.Web/Controllers/AccountController.cs
+ M backend/GreenShop.Web/GreenShop.Web.csproj
+ M backend/GreenShop.Web/Program.cs
+ M backend/GreenShop.Web/Services/UserSession.cs
+ M docker-compose.yml
+ M nginx/default.conf
+?? backend/GreenShop.Web/Services/Observability.cs
+?? docs/evidence/commit2/
+?? monitoring/
+?? scripts/deploy-monitoring.py
+?? tests/monitoring/

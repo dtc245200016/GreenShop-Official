@@ -1,0 +1,24 @@
+apiVersion: 1
+contactPoints:
+- orgId: 1
+  name: GreenShop Security Alerts
+  receivers:
+  - uid: greenshop-qa-webhook
+    type: webhook
+    disableResolveMessage: false
+    settings:
+      url: $QA_WEBHOOK_URL
+      httpMethod: POST
+      title: GreenShop alert {{ .Status }}
+      message: '{{ range .Alerts }}name={{ .Labels.alertname }} severity={{ .Labels.severity
+        }} incident={{ .Labels.incident }} status={{ .Status }} startsAt={{ .StartsAt
+        }} summary={{ .Annotations.summary }} grafana={{ .GeneratorURL }}{{ end }}'
+policies:
+- orgId: 1
+  receiver: GreenShop Security Alerts
+  group_by:
+  - alertname
+  - incident
+  group_wait: 0s
+  group_interval: 10s
+  repeat_interval: 4h

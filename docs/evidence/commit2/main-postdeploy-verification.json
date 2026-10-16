@@ -1,0 +1,180 @@
+{
+  "status": "PASS",
+  "time": "2026-10-16T13:54:13.026970+00:00",
+  "application_table_hashes_unchanged": true,
+  "uploads_keys_tls_unchanged": true,
+  "migration_ids_unchanged": true,
+  "existing_application_environment_unchanged": true,
+  "database_phpmyadmin_container_ids_unchanged": true,
+  "all_Main_services_healthy": true,
+  "grafana_auth": "UI login checked below, default password rejected, anonymous API rejected",
+  "mysql_exporter_grants": [
+    "GRANT PROCESS ON *.* TO `greenshop_exporter`@`%`"
+  ],
+  "public_metrics": "404 even with valid token; direct app port without token 404",
+  "rules": [
+    {
+      "name": "GreenShopSuspiciousLoginFailures",
+      "state": "inactive",
+      "health": "ok"
+    },
+    {
+      "name": "GreenShopWebDown",
+      "state": "inactive",
+      "health": "ok"
+    },
+    {
+      "name": "GreenShopMySQLDown",
+      "state": "inactive",
+      "health": "ok"
+    },
+    {
+      "name": "GreenShopHighHttp5xxRate",
+      "state": "inactive",
+      "health": "ok"
+    }
+  ],
+  "panels": [
+    {
+      "dashboard": "greenshop-security",
+      "panel": "Failed Login Attempts — process lifetime",
+      "series": 1
+    },
+    {
+      "dashboard": "greenshop-security",
+      "panel": "Successful Logins — process lifetime",
+      "series": 1
+    },
+    {
+      "dashboard": "greenshop-security",
+      "panel": "Failed Login Attempts — Last 1 Minute (exact process window)",
+      "series": 1
+    },
+    {
+      "dashboard": "greenshop-security",
+      "panel": "Failed Login Attempts — Last 5 Minutes (sampled estimate)",
+      "series": 1
+    },
+    {
+      "dashboard": "greenshop-security",
+      "panel": "Authentication Failure Trend",
+      "series": 1
+    },
+    {
+      "dashboard": "greenshop-security",
+      "panel": "Security Condition — GS-SEC-001",
+      "series": 1
+    },
+    {
+      "dashboard": "greenshop-security",
+      "panel": "Authorization Denied Events",
+      "series": 1
+    },
+    {
+      "dashboard": "greenshop-security",
+      "panel": "Recent Failures (exact) and Detection Window",
+      "series": 1
+    },
+    {
+      "dashboard": "greenshop-infrastructure",
+      "panel": "Overall Service Status",
+      "series": 5
+    },
+    {
+      "dashboard": "greenshop-infrastructure",
+      "panel": "Container CPU Usage",
+      "series": 10
+    },
+    {
+      "dashboard": "greenshop-infrastructure",
+      "panel": "Container Memory Usage",
+      "series": 10
+    },
+    {
+      "dashboard": "greenshop-infrastructure",
+      "panel": "Container Network Traffic",
+      "series": 10
+    },
+    {
+      "dashboard": "greenshop-infrastructure",
+      "panel": "Container Availability — seconds since last seen",
+      "series": 10
+    },
+    {
+      "dashboard": "greenshop-infrastructure",
+      "panel": "Nginx Connections",
+      "series": 1
+    },
+    {
+      "dashboard": "greenshop-infrastructure",
+      "panel": "MySQL Availability",
+      "series": 1
+    },
+    {
+      "dashboard": "greenshop-infrastructure",
+      "panel": "MySQL Connections",
+      "series": 1
+    },
+    {
+      "dashboard": "greenshop-infrastructure",
+      "panel": "Nginx Reading / Writing / Waiting",
+      "series": 3
+    },
+    {
+      "dashboard": "greenshop-application",
+      "panel": "HTTP Requests Per Second",
+      "series": 1
+    },
+    {
+      "dashboard": "greenshop-application",
+      "panel": "HTTP Response Duration P50",
+      "series": 1
+    },
+    {
+      "dashboard": "greenshop-application",
+      "panel": "HTTP Response Duration P95",
+      "series": 1
+    },
+    {
+      "dashboard": "greenshop-application",
+      "panel": "HTTP Error Rate (4xx + 5xx)",
+      "series": 1
+    },
+    {
+      "dashboard": "greenshop-application",
+      "panel": "HTTP 4xx Rate",
+      "series": 1
+    },
+    {
+      "dashboard": "greenshop-application",
+      "panel": "HTTP 5xx Rate",
+      "series": 1
+    },
+    {
+      "dashboard": "greenshop-application",
+      "panel": "Request Distribution by Safe Group",
+      "series": 6
+    },
+    {
+      "dashboard": "greenshop-application",
+      "panel": "MySQL Active Threads",
+      "series": 1
+    },
+    {
+      "dashboard": "greenshop-application",
+      "panel": "MySQL Queries",
+      "series": 1
+    },
+    {
+      "dashboard": "greenshop-application",
+      "panel": "Application Availability",
+      "series": 1
+    },
+    {
+      "dashboard": "greenshop-application",
+      "panel": "Nginx Requests",
+      "series": 1
+    }
+  ],
+  "Main_customer_admin_login": "NOT TESTED: no credentials; no Main application accounts created or modified"
+}

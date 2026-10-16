@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "time": "2026-10-16T13:36:06.989037+00:00",
+  "checks": [
+    "GET login does not count",
+    "invalid form does not count",
+    "CSRF missing rejected 400",
+    "Customer/Admin valid sign-in",
+    "Customer cannot access Admin",
+    "wrong-role login denied without credential-failure increment"
+  ],
+  "main_authenticated_tests": "NOT TESTED: no credentials; no Main account changes"
+}

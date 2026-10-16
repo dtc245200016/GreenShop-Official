@@ -1,0 +1,52 @@
+{
+  "status": "PASS",
+  "time": "2026-10-16T13:52:57Z",
+  "project": "dtc245200016_btl_tkqt_htpm",
+  "database_container_unchanged": true,
+  "phpmyadmin_container_unchanged": true,
+  "targets": [
+    {
+      "labels": {
+        "instance": "cadvisor:8080",
+        "job": "cadvisor"
+      },
+      "health": "up",
+      "lastScrape": "2026-10-16T13:52:51.032926718Z"
+    },
+    {
+      "labels": {
+        "instance": "web_app:8080",
+        "job": "greenshop"
+      },
+      "health": "up",
+      "lastScrape": "2026-10-16T13:52:48.472466928Z"
+    },
+    {
+      "labels": {
+        "instance": "mysql-exporter:9104",
+        "job": "mysql"
+      },
+      "health": "up",
+      "lastScrape": "2026-10-16T13:52:49.420505997Z"
+    },
+    {
+      "labels": {
+        "instance": "nginx-exporter:9113",
+        "job": "nginx"
+      },
+      "health": "up",
+      "lastScrape": "2026-10-16T13:52:50.848437124Z"
+    },
+    {
+      "labels": {
+        "instance": "prometheus:9090",
+        "job": "prometheus"
+      },
+      "health": "up",
+      "lastScrape": "2026-10-16T13:52:51.063131585Z"
+    }
+  ],
+  "smoke": "HTTPS, database readiness, product browsing, login pages PASS; public metrics/stub_status 404",
+  "authenticated_main": "NOT TESTED: no credentials; no application accounts changed",
+  "ports": "Grafana 127.0.0.1:3000, Prometheus 127.0.0.1:9090; exporters and internal QA sink unpublished"
+}
