@@ -1,0 +1,4 @@
+@foreach (var entry in new[] { (Key: "SuccessMessage", Css: "success", Role: "status"), (Key: "ErrorMessage", Css: "danger", Role: "alert"), (Key: "WarningMessage", Css: "warning", Role: "status") })
+{
+    if (TempData[entry.Key] is string message) { <div class="alert alert-@entry.Css shop-feedback" role="@entry.Role">@message <a asp-area="" asp-controller="GioHang" asp-action="QuanLyGioHang">Xem giỏ hàng</a></div> }
+}

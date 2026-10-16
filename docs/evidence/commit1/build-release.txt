@@ -1,0 +1,7 @@
+  GreenShop.Web -> /home/trung/DTC245200016_BTL_TKQT_HTPM/backend/GreenShop.Web/bin/Release/net8.0/GreenShop.Web.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:56.31

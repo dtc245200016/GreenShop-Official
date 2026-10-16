@@ -1,0 +1,25 @@
+@model CategoryItemViewModel
+@{
+    ViewData["Title"] = "Xóa danh mục";
+}
+<partial name="_Assets" />
+<section class="category-page category-form-page">
+    <a asp-action="QuanLyDanhMuc" class="category-back"><i class="fa-solid fa-arrow-left me-2" aria-hidden="true"></i>Quản lý danh mục</a>
+    <header class="category-page-heading"><span class="category-eyebrow">XÁC NHẬN THAO TÁC</span><h1>Xóa danh mục</h1><p>Kiểm tra thông tin trước khi xác nhận.</p></header>
+    <div class="category-panel category-form-panel">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+        <h2 class="h4 category-wrap">@Model.Name</h2>
+        <p class="category-description text-muted">@(string.IsNullOrEmpty(Model.Description) ? "Chưa có mô tả." : Model.Description)</p>
+        @if (Model.ProductCount > 0)
+        {
+            <div class="alert alert-warning" role="alert">Danh mục có @Model.ProductCount sản phẩm. Hãy chuyển sản phẩm sang danh mục khác trước khi xóa.</div>
+        }
+        else
+        {
+            <div class="alert alert-warning">Danh mục chưa có sản phẩm. Xóa danh mục sẽ không thể hoàn tác.</div>
+        }
+        <form asp-action="XoaDanhMuc" asp-route-id="@Model.Id" method="post" data-submit-once>
+            <div class="category-form-actions"><button type="submit" class="btn category-danger" disabled="@(Model.ProductCount > 0)"><i class="fa-solid fa-trash me-2" aria-hidden="true"></i><span data-submit-label>Xác nhận xóa</span></button><a asp-action="QuanLyDanhMuc" class="btn category-secondary">Hủy</a></div>
+        </form>
+    </div>
+</section>

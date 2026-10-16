@@ -1,0 +1,36 @@
+@model CheckoutViewModel
+@using GreenShop.Web.Services
+@using System.Globalization
+@{
+    ViewData["Title"]="Xác nhận mua hàng";
+    var enabled=VietQrImages.Enabled(Model.Policy);
+    var canBuy=Model.Lines.Count>0 && Model.Lines.All(i=>i.StockQuantity>=i.Quantity && i.Quantity>0) && Model.Lines.Count<=100;
+    var progress=Model.Policy.FreeShippingThreshold<=0 ? 100 : Math.Min(100,Model.Subtotal/Model.Policy.FreeShippingThreshold*100);
+}
+<nav class="shop-breadcrumb" aria-label="Điều hướng"><a asp-controller="GioHang" asp-action="QuanLyGioHang">Giỏ hàng</a><span>/</span><span aria-current="page">Xác nhận mua hàng</span></nav>
+<section class="shop-page-heading"><span class="shop-eyebrow">GREENSHOP · BƯỚC CUỐI CÙNG</span><h1>Một bước nữa đến điều xanh</h1><p>Kiểm tra sản phẩm, phí giao hàng và chọn cách thanh toán phù hợp.</p></section>
+<div class="checkout-layout payment-checkout" data-shipping-preview data-price="@Model.Product.Price.ToString(CultureInfo.InvariantCulture)" data-cart-subtotal="@(Model.FromCart ? Model.Subtotal.ToString(CultureInfo.InvariantCulture) : "")" data-flat-fee="@Model.Policy.FlatShippingFee.ToString(CultureInfo.InvariantCulture)" data-free-threshold="@Model.Policy.FreeShippingThreshold.ToString(CultureInfo.InvariantCulture)">
+<form asp-action="@(Model.FromCart ? "XacNhanGioHang" : "XacNhanMuaHang")" asp-route-id="@(Model.FromCart ? null : (int?)Model.Product.Id)" method="post" class="checkout-form shop-panel" data-submit-once>
+<h2>Thông tin người nhận</h2><div asp-validation-summary="All" class="text-danger" role="alert"></div>
+<input asp-for="ConfirmationToken" type="hidden" /><input asp-for="QuotedPrice" type="hidden" /><input asp-for="PolicyVersion" type="hidden" />
+@if(Model.FromCart) { <input asp-for="CartQuote" type="hidden" /><input asp-for="Quantity" type="hidden" /> }
+<div class="shop-field"><label asp-for="RecipientName"></label><input asp-for="RecipientName" maxlength="100" autocomplete="name" required /><span asp-validation-for="RecipientName" class="text-danger"></span></div>
+<div class="payment-contact-row"><div class="shop-field"><label asp-for="Phone"></label><input asp-for="Phone" maxlength="21" autocomplete="tel" inputmode="tel" required /><span asp-validation-for="Phone" class="text-danger"></span></div>
+@if(!Model.FromCart) { <div class="shop-field"><label asp-for="Quantity">Số lượng</label><input asp-for="Quantity" type="number" min="1" max="@Math.Min(1000000,Math.Max(1,Model.Product.StockQuantity))" required /><span asp-validation-for="Quantity" class="text-danger"></span></div> }</div>
+<div class="shop-field"><label asp-for="Address"></label><textarea asp-for="Address" maxlength="500" minlength="10" rows="3" autocomplete="street-address" placeholder="Số nhà, đường, phường/xã, tỉnh/thành phố" required></textarea><span asp-validation-for="Address" class="text-danger"></span></div>
+<fieldset class="payment-methods"><legend>Phương thức thanh toán</legend>
+<label class="payment-choice"><input asp-for="PaymentMethod" type="radio" value="COD" /><span class="payment-choice-icon"><i class="fa-solid fa-money-bill-wave" aria-hidden="true"></i></span><span><strong>Thanh toán khi nhận hàng (COD)</strong><small>Thanh toán khi nhận được sản phẩm.</small></span><i class="fa-solid fa-circle-check payment-selected" aria-hidden="true"></i></label>
+<label class="payment-choice @(enabled ? "" : "is-unavailable")"><input asp-for="PaymentMethod" type="radio" value="VIETQR" disabled="@(!enabled)" /><span class="payment-choice-icon"><i class="fa-solid fa-qrcode" aria-hidden="true"></i></span><span><strong>Chuyển khoản ngân hàng qua VietQR</strong><small>@(enabled ? "Quét mã QR để chuyển khoản trước khi giao hàng." : "Cửa hàng chưa bật chuyển khoản. Bạn vẫn có thể chọn COD.")</small></span><i class="fa-solid fa-circle-check payment-selected" aria-hidden="true"></i></label><span asp-validation-for="PaymentMethod" class="text-danger"></span>
+</fieldset>
+<p class="payment-method-note" data-method-note>@(Model.PaymentMethod=="VIETQR" ? "Sau khi đặt hàng, GreenShop sẽ hiển thị mã QR để bạn chuyển khoản." : "Bạn sẽ thanh toán khi nhận được hàng.")</p>
+<button class="shop-btn primary payment-place-order" type="submit" disabled="@(!canBuy)">Xác nhận đặt hàng <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
+<p class="payment-form-footnote"><i class="fa-solid fa-lock" aria-hidden="true"></i>Giá, phí ship và tồn kho được cửa hàng kiểm tra lại khi đặt hàng.</p>
+</form>
+<aside class="shop-summary checkout-summary payment-summary"><span class="shop-eyebrow">NHỮNG ĐIỀU XANH BẠN CHỌN</span><h2>Đơn hàng của bạn</h2>
+@foreach(var line in Model.Lines) { <div class="checkout-mini-item"><img src="@StoreDisplay.Image(line.ImageUrl)" data-product-image alt="@line.Name" width="76" height="76" /><div><h3>@line.Name</h3><p>@OrderWorkflow.Money(line.Price) · <span data-checkout-quantity>@line.Quantity</span> sản phẩm</p></div></div> }
+<div class="shipping-progress"><p data-shipping-message>@(Model.Subtotal>=Model.Policy.FreeShippingThreshold ? "Đơn hàng của bạn được miễn phí vận chuyển." : "Mua thêm "+OrderWorkflow.Money(Model.Policy.FreeShippingThreshold-Model.Subtotal)+" để được miễn phí vận chuyển.")</p><div class="shipping-progress-track" aria-hidden="true"><span data-shipping-progress style="width:@progress.ToString("0.##",CultureInfo.InvariantCulture)%"></span></div></div>
+<div class="receipt-line"><span>Tạm tính</span><strong data-payment-subtotal>@OrderWorkflow.Money(Model.Subtotal)</strong></div>
+<div class="receipt-line"><span>Phí vận chuyển</span><strong data-payment-shipping>@OrderWorkflow.Money(Model.ShippingFee)</strong></div>
+<div class="receipt-total"><span>Tổng thanh toán</span><strong data-payment-total>@OrderWorkflow.Money(Model.Total)</strong></div>
+<small>Áp dụng toàn quốc. Miễn phí giao hàng từ @OrderWorkflow.Money(Model.Policy.FreeShippingThreshold) tiền sản phẩm.</small>
+</aside></div>

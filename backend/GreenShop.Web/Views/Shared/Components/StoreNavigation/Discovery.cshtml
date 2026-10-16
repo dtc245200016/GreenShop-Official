@@ -1,0 +1,17 @@
+@model StoreNavigationViewModel
+@if (Model.Categories.Count > 0)
+{
+    <section id="discover-categories" class="category-discovery" aria-labelledby="discovery-title">
+        <div class="shop-section-heading"><div><span class="shop-eyebrow">MỖI GÓC NHỎ, MỘT LỰA CHỌN</span><h2 id="discovery-title">Khám phá theo danh mục</h2></div><a class="shop-text-link" asp-controller="SanPham" asp-action="CuaHang">Đến cửa hàng <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div>
+        <div class="category-discovery-grid">
+            @foreach (var category in Model.Categories.Take(6))
+            {
+                <a class="discovery-card @(category.ImageUrl == null ? "without-image" : "")" asp-controller="SanPham" asp-action="CuaHang" asp-route-categoryId="@category.Id">
+                    @if (category.ImageUrl != null) { <img src="@StoreDisplay.Image(category.ImageUrl)" data-product-image alt="" loading="lazy" width="480" height="360" /> } else { <span class="discovery-botanical" aria-hidden="true"></span> }
+                    <div class="discovery-copy"><span>@category.ProductCount sản phẩm</span><h3>@category.Name</h3><span class="discovery-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-up-right-from-square"></i></span></div>
+                </a>
+            }
+            <a class="discovery-editorial" asp-controller="SanPham" asp-action="CuaHang"><span class="shop-eyebrow">DÀNH CHO KHÔNG GIAN CỦA BẠN</span><h3>Bắt đầu từ<br />một điều <em>bạn thích.</em></h3><span>Khám phá tất cả <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span></a>
+        </div>
+    </section>
+}

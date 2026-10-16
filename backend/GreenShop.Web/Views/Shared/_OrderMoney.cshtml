@@ -1,0 +1,7 @@
+@model Order
+@using GreenShop.Web.Services
+@if(Model.Subtotal.HasValue && Model.ShippingFee.HasValue) {
+<div class="receipt-line"><span>Tiền sản phẩm</span><strong>@OrderWorkflow.Money(Model.Subtotal.Value)</strong></div>
+<div class="receipt-line"><span>Phí vận chuyển</span><strong>@OrderWorkflow.Money(Model.ShippingFee.Value)</strong></div>
+} else { <p class="payment-history-hint">Đơn cũ chưa lưu chi tiết tiền hàng/phí ship. Tổng thanh toán dưới đây được giữ nguyên từ lúc đặt.</p> }
+<div class="receipt-total"><span>Tổng thanh toán</span><strong>@OrderWorkflow.Money(Model.Total)</strong></div>

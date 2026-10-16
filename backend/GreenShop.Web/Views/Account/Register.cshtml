@@ -1,0 +1,94 @@
+@model GreenShop.Web.Models.RegisterViewModel
+@{
+    ViewData["Title"] = "Đăng Ký - GreenShop";
+    Layout = "_AuthLayout";
+}
+
+
+
+<div class="auth-container">
+    <div class="row g-0">
+        <!-- Banner Bên Trái -->
+        <div class="col-md-5 auth-banner d-none d-md-flex">
+            <h2 class="fw-bold mb-3">Tham gia cùng GreenShop</h2>
+            <p class="fs-6 opacity-90 mb-4">Tạo tài khoản để chọn sản phẩm yêu thích, lưu giỏ hàng và đặt hàng tại GreenShop.</p>
+            <div class="mt-auto">
+                <small class="opacity-75">🌱 Kiến tạo không gian sống xanh</small>
+            </div>
+        </div>
+
+        <!-- Form Đăng Ký Bên Phải -->
+        <div class="col-md-7 auth-form-wrapper">
+            <h3 class="fw-bold text-success mb-1">Tạo Tài Khoản</h3>
+            <p class="text-muted mb-4 small">Đã có tài khoản? <a asp-action="Login" asp-route-returnUrl="@ViewData["ReturnUrl"]" class="text-success fw-bold text-decoration-none">Đăng nhập ngay</a></p>
+
+            <form asp-action="Register" method="post" data-submit-once>
+                <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3 small"></div>
+
+                <div class="mb-3">
+                    <label asp-for="FullName" class="form-label small fw-bold text-secondary">Họ và Tên</label>
+                    <input asp-for="FullName" class="form-control" placeholder="Nguyễn Văn A" />
+                    <span asp-validation-for="FullName" class="text-danger small"></span>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Email" class="form-label small fw-bold text-secondary">Email</label>
+                        <input asp-for="Email" class="form-control" placeholder="name@domain.com" />
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Phone" class="form-label small fw-bold text-secondary">Số điện thoại</label>
+                        <input asp-for="Phone" class="form-control" placeholder="0912345678" />
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="regPassword" class="form-label small fw-bold text-secondary">Mật khẩu</label>
+                    <div class="input-group">
+                        <input asp-for="Password" type="password" id="regPassword" class="form-control" placeholder="Nhập mật khẩu của bạn" />
+                        <button type="button" class="btn btn-outline-secondary" aria-label="Hiện hoặc ẩn mật khẩu" aria-pressed="false" onclick="togglePassword('regPassword', this)">
+                            <i class="fa-regular fa-eye"></i>
+                        </button>
+                    </div>
+                    <span asp-validation-for="Password" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-4">
+                    <label for="regConfirmPassword" class="form-label small fw-bold text-secondary">Xác nhận Mật khẩu</label>
+                    <div class="input-group">
+                        <input asp-for="ConfirmPassword" type="password" id="regConfirmPassword" class="form-control" placeholder="Nhập lại mật khẩu của bạn" />
+                        <button type="button" class="btn btn-outline-secondary" aria-label="Hiện hoặc ẩn mật khẩu" aria-pressed="false" onclick="togglePassword('regConfirmPassword', this)">
+                            <i class="fa-regular fa-eye"></i>
+                        </button>
+                    </div>
+                    <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                </div>
+
+                <button type="submit" class="btn btn-success w-100 py-2.5 rounded-pill fw-bold shadow-sm">
+                    Đăng Ký Tài Khoản <i class="fa-solid fa-user-plus ms-2"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function togglePassword(inputId, btn) {
+            const input = document.getElementById(inputId);
+            const icon = btn.querySelector('i');
+            btn.setAttribute("aria-pressed", String(input.type === "password"));
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = "password";
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+    </script>
+}

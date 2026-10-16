@@ -1,0 +1,9 @@
+@model AdminUserFilter
+<form asp-action="QuanLyNguoiDung" method="get" class="order-filter user-filter">
+    <div class="order-search-field"><label for="userSearch">Tìm người dùng</label><div class="order-input-icon"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input id="userSearch" name="Search" value="@Model.Search" maxlength="100" placeholder="Nhập họ tên hoặc email" /></div></div>
+    <div><label for="userRole">Vai trò</label><select id="userRole" asp-for="Role"><option value="">Tất cả vai trò</option><option value="0">Khách hàng</option><option value="1">Quản trị viên</option></select></div>
+    <div><label for="userActive">Trạng thái tài khoản</label><select id="userActive" asp-for="Active"><option value="">Tất cả trạng thái</option><option value="true">Đang hoạt động</option><option value="false">Đã khóa</option></select></div>
+    <div><label for="userSort">Sắp xếp</label><select id="userSort" asp-for="Sort"><option value="newest">Mới nhất</option><option value="oldest">Cũ nhất</option><option value="name">Họ tên A–Z</option></select></div>
+    <div><label for="userPageSize">Số tài khoản / trang</label><select id="userPageSize" asp-for="PageSize"><option value="15">15 tài khoản</option><option value="30">30 tài khoản</option><option value="50">50 tài khoản</option></select></div>
+    <div class="order-filter-actions"><a asp-action="QuanLyNguoiDung" class="order-btn secondary">Xóa bộ lọc</a><button type="submit" class="order-btn primary">Áp dụng bộ lọc</button></div>
+</form>

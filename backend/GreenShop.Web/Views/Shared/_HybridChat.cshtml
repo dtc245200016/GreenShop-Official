@@ -1,0 +1,39 @@
+<button type="button" class="shop-chat-launcher shop-btn primary" data-hybrid-open title="Nhấn để mở chat; kéo để di chuyển; Alt + phím mũi tên để dịch chuyển" aria-controls="hybrid-chat" aria-expanded="false">
+    <span class="botanical-chat-mark" aria-hidden="true"><svg viewBox="0 0 48 48" focusable="false">
+        <path class="botanical-chat-bubble" d="M12 24h24a6 6 0 0 1 6 6v5a6 6 0 0 1-6 6H20l-9 4v-5a6 6 0 0 1-5-6v-4a6 6 0 0 1 6-6Z" />
+        <g class="botanical-chat-sprout"><path class="botanical-chat-stem" d="M24 33V19" /><path class="botanical-chat-leaf" d="M24 25C13 26 10 18 11 12c9 0 15 5 13 13Z" /><path class="botanical-chat-leaf" d="M24 20C23 10 30 5 38 5c1 8-4 15-14 15Z" /></g>
+    </svg></span><span>Chat với GreenShop</span>
+</button>
+<section id="hybrid-chat" class="hybrid-chat" data-hybrid-chat hidden aria-labelledby="hybrid-chat-title">
+    <header><button type="button" class="hybrid-brand-icon" data-chat-drag-handle aria-label="Di chuyển cửa sổ chat" title="Kéo để di chuyển; dùng phím mũi tên; Home để về vị trí mặc định"><i class="fa-solid fa-leaf" aria-hidden="true"></i></button><div><strong id="hybrid-chat-title">GreenShop Chat</strong><small data-chat-presence>Trợ lý AI · Đang kết nối</small></div><button type="button" data-hybrid-close aria-label="Thu gọn trò chuyện"><i class="fa-solid fa-minus" aria-hidden="true"></i></button></header>
+    <div class="hybrid-tabs" role="tablist" aria-label="Chế độ trò chuyện">
+        <button id="ai-tab" type="button" role="tab" aria-controls="ai-panel" aria-selected="true" data-hybrid-tab="ai"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> Trợ lý AI</button>
+        <button id="store-tab" type="button" role="tab" aria-controls="store-panel" aria-selected="false" tabindex="-1" data-hybrid-tab="store"><i class="fa-regular fa-message" aria-hidden="true"></i> Chat với Shop</button>
+    </div>
+    <div id="ai-panel" class="hybrid-pane" role="tabpanel" aria-labelledby="ai-tab">
+        <p data-ai-status role="status">Đang kiểm tra trợ lý AI…</p>
+        <div data-ai-messages class="chat-messages" tabindex="0" aria-label="Hội thoại trợ lý AI" role="log" aria-live="polite"></div>
+        <div class="hybrid-suggestions" aria-label="Gợi ý câu hỏi">
+            <button type="button" data-chat-suggestion="Gợi ý cây dễ chăm để bàn làm việc">Cây để bàn</button>
+            <button type="button" data-chat-suggestion="Gợi ý hoa tặng sinh nhật">Hoa tặng sinh nhật</button>
+            <button type="button" data-chat-suggestion="Phí giao hàng được tính như thế nào?">Phí giao hàng</button>
+        </div>
+        <form method="post" asp-area="" asp-controller="TroLy" asp-action="Hoi" data-ai-form>
+            <label for="ai-question">Bạn muốn hỏi về cây nào?</label><textarea id="ai-question" name="Question" maxlength="1000" minlength="2" required rows="1" placeholder="Nhắn điều bạn đang tìm…"></textarea><button class="shop-btn primary hybrid-send" type="submit" aria-label="Hỏi trợ lý"><i class="fa-regular fa-paper-plane" aria-hidden="true"></i></button>
+        </form><button type="button" class="shop-btn" data-ai-reset><i class="fa-solid fa-rotate-right" aria-hidden="true"></i> Cuộc trò chuyện mới</button>
+    </div>
+    <div id="store-panel" class="hybrid-pane" role="tabpanel" aria-labelledby="store-tab" hidden>
+    @if(User.IsInRole("Customer")) {
+        <section class="shop-chat" data-shop-chat data-chat-identity="@(GreenShop.Web.Services.ShoppingIdentity.UserId(User)):@(GreenShop.Web.Services.UserSession.Version(User))" data-widget-chat data-conversation-id="0" data-messages-url="/TuongTac/TinNhanMoi" data-read-url="/TuongTac/DaDoc" data-admin="false">
+            <div class="chat-messages" data-chat-messages tabindex="0" role="log" aria-live="polite" aria-label="Tin nhắn với cửa hàng"><p data-chat-empty>Đang tải cuộc trò chuyện…</p></div>
+            <form method="post" asp-area="" asp-controller="TuongTac" asp-action="GuiTinNhan" data-chat-form>
+                <label for="widget-chat-content">Tin nhắn cho cửa hàng</label><textarea id="widget-chat-content" name="Content" rows="1" maxlength="2000" placeholder="Nhắn tin cho cửa hàng…" required></textarea><input type="hidden" name="RequestToken" value="@Guid.NewGuid().ToString("N")" /><button class="shop-btn primary hybrid-send" type="submit" aria-label="Gửi tin nhắn"><i class="fa-regular fa-paper-plane" aria-hidden="true"></i></button>
+            </form><p class="chat-feedback" data-chat-feedback role="status"></p>
+        </section>
+    } else if(User.IsInRole("Admin")) {
+        <p>Bạn đang xem bằng tài khoản quản trị.</p><p><a class="shop-btn primary" href="/Admin/KhachHang/TinNhan">Mở hộp thư quản trị</a></p>
+    } else {
+        <p>Đăng nhập để nhắn tin trực tiếp với cửa hàng.</p><a class="shop-btn primary" href="/Account/Login?returnUrl=%2F%3Fchat%3Dshop">Đăng nhập</a>
+    }
+    </div>
+</section>

@@ -1,0 +1,16 @@
+@model AdminUserDetailViewModel
+@{ var a=Model.Account; }
+<section class="order-panel order-info-panel"><h2>Vai trò và trạng thái</h2><dl><dt>Quyền hiện tại</dt><dd><span class="user-role @(a.Role==UserRole.Admin?"administrator":"")">@a.RoleLabel</span></dd><dt>Trạng thái</dt><dd><span class="order-badge @(a.IsActive?"delivered":"cancelled")">@(a.IsActive?"Đang hoạt động":"Đã khóa")</span></dd></dl>
+@if(a.IsShopOwner){<p class="user-protection"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i>Tài khoản chủ shop được bảo vệ. Chỉ chủ shop được phân quyền người dùng.</p>}
+else if(Model.IsSelf) { <p class="user-protection"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i>Đây là tài khoản bạn đang dùng. Bạn có thể chỉnh hồ sơ nhưng không thể tự khóa hoặc tự hạ quyền.</p> }
+else if(Model.IsLastAdmin) { <p class="user-protection">Đây là quản trị viên đang hoạt động cuối cùng. Cần giữ quyền truy cập quản trị cho hệ thống.</p> }
+</section>
+@if(Model.CanChangeRole) {
+    <section class="order-panel order-info-panel user-role-panel"><h2>Đổi quyền</h2><p class="order-helper">Quản trị viên có quyền quản lý sản phẩm, đơn hàng và tài khoản. Chỉ cấp quyền cho người được tin cậy.</p>
+    <form asp-action="ThayDoiVaiTro" asp-route-id="@a.Id" method="post" data-order-submit data-order-confirm data-confirm-title="Đổi quyền tài khoản" data-confirm-account="@a.Email" data-confirm-current-role="@a.RoleLabel" data-confirm-role><input type="hidden" name="ExpectedVersion" value="@a.Version" /><div class="user-field"><label for="TargetRole">Vai trò mới</label><select id="TargetRole" name="TargetRole" data-current-role="@((int)a.Role)"><option value="0" selected="@(a.Role==UserRole.Customer)">Khách hàng</option><option value="1" selected="@(a.Role==UserRole.Admin)">Quản trị viên</option></select></div><button class="order-btn primary" type="submit">Đổi quyền</button></form></section>
+}
+@if(Model.CanChangeStatus){
+    <section class="order-panel order-info-panel user-lock-panel"><h2>@(a.IsActive?"Khóa tài khoản":"Mở khóa tài khoản")</h2><p class="order-helper">@(a.IsActive?"Người dùng sẽ bị đăng xuất và không thể đăng nhập mới. Lịch sử mua sắm được giữ nguyên.":"Người dùng có thể đăng nhập lại với vai trò hiện tại. Mở khóa không tự cấp thêm quyền.")</p><form asp-action="@(a.IsActive?"KhoaTaiKhoan":"MoKhoaTaiKhoan")" asp-route-id="@a.Id" method="post" data-order-submit data-order-confirm data-confirm-title="@(a.IsActive?"Khóa tài khoản":"Mở khóa tài khoản")" data-confirm-label="@(a.IsActive?"Xác nhận khóa tài khoản":"Xác nhận mở khóa")" data-confirm-description="@(a.IsActive?$"Khóa tài khoản {a.Email}? Các phiên đăng nhập sẽ bị thu hồi; đơn hàng, giỏ hàng và mật khẩu được giữ nguyên.":$"Mở khóa tài khoản {a.Email}? Người dùng có thể đăng nhập lại với quyền {a.RoleLabel}. Không tự động đăng nhập hoặc đổi quyền.")" data-confirm-danger="@(a.IsActive?"true":"false")"><input name="ExpectedVersion" type="hidden" value="@a.Version" /><button class="order-btn @(a.IsActive?"danger":"primary")" type="submit">@(a.IsActive?"Khóa tài khoản":"Mở khóa tài khoản")</button></form></section>
+}
+
+@if(!Model.CanChangeRole && !a.IsShopOwner && !Model.IsSelf){<p class="user-protection">Chỉ chủ shop được thay đổi quyền. Quản trị viên thông thường không được sửa hoặc khóa tài khoản quản trị viên khác.</p>}

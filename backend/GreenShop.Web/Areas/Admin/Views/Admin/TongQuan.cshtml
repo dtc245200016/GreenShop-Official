@@ -1,0 +1,115 @@
+@model AdminDashboardViewModel
+@using System.Globalization
+@{
+    ViewData["Title"] = "Tổng quan";
+    var p = Model.Period;
+    var vi = CultureInfo.GetCultureInfo("vi-VN");
+    var maximum = Math.Max(1,Model.Points.Count==0 ? 0 : Model.Points.Max(x=>x.Value));
+    string Svg(decimal n) => n.ToString("0.##",CultureInfo.InvariantCulture);
+    string Number(long n) => n.ToString("N0",vi);
+    var kpis = new[] {
+        (Key:"orders",Label:"Đơn hàng trong kỳ",Value:Number(Model.Orders),Note:"Tất cả trạng thái, kể cả đơn hủy",Compare:AdminDashboardViewModel.Comparison(Model.Orders,Model.PreviousOrders),Icon:"receipt"),
+        (Key:"value",Label:"Giá trị đơn đã giao",Value:OrderWorkflow.Money(Model.DeliveredValue),Note:"Theo ngày đặt · không phải tiền thực thu",Compare:AdminDashboardViewModel.Comparison(Model.DeliveredValue,Model.PreviousValue),Icon:"coins"),
+        (Key:"customers",Label:"Khách hàng mới trong kỳ",Value:Number(Model.NewCustomers),Note:"Tài khoản hiện mang vai trò Khách hàng",Compare:AdminDashboardViewModel.Comparison(Model.NewCustomers,Model.PreviousCustomers),Icon:"user-plus"),
+        (Key:"sold",Label:"Sản phẩm đã bán",Value:Number(Model.Sold),Note:"Số lượng trong đơn đã giao đặt trong kỳ",Compare:AdminDashboardViewModel.Comparison(Model.Sold,Model.PreviousSold),Icon:"seedling"),
+        (Key:"shipping",Label:"Đơn đang giao trong kỳ",Value:Number(Model.Shipping),Note:"Đơn đặt trong kỳ, hiện đang giao",Compare:"Chưa đồng nghĩa với đã thanh toán",Icon:"truck-fast"),
+        (Key:"pending",Label:"Đơn chờ xác nhận trong kỳ",Value:Number(Model.Pending),Note:"Đơn đặt trong kỳ, hiện chờ xác nhận",Compare:"Công việc toàn thời gian ở phần Cần xử lý",Icon:"clock")
+    };
+}
+<div class="dashboard" data-range="@p.Range" data-start="@p.StartUtc.ToString("O")" data-end="@p.EndUtc.ToString("O")" data-previous="@p.PreviousStartUtc.ToString("O")">
+    <nav class="dash-breadcrumb" aria-label="Điều hướng"><span aria-current="page">Tổng quan</span><span> / GreenShop</span></nav>
+    <header class="dash-header">
+        <div><p class="dash-eyebrow">GREENSHOP · HOẠT ĐỘNG KINH DOANH</p><h1>Tổng quan</h1><p>Chào @(User.Identity?.Name ?? "Quản trị viên"), đây là tình hình hoạt động của GreenShop.</p></div>
+        <div class="dash-date"><i class="fa-regular fa-calendar" aria-hidden="true"></i><time datetime="@p.GeneratedAt.ToString("yyyy-MM-dd")">@p.GeneratedAt.ToString("dddd, dd/MM/yyyy",vi)</time><small>Cập nhật @p.GeneratedAt.ToString("HH:mm") · giờ Việt Nam</small></div>
+    </header>
+    <form class="dash-filter" method="get" asp-action="TongQuan">
+        <div><label for="dashRange">Khoảng thời gian</label><select id="dashRange" name="range">
+            @foreach (var option in new[] {("7d","7 ngày gần nhất"),("30d","30 ngày gần nhất"),("month","Tháng hiện tại"),("year","Năm hiện tại")}) {
+                <option value="@option.Item1" selected="@(p.Range==option.Item1)">@option.Item2</option>
+            }
+        </select></div>
+        <button class="dash-btn dash-primary" type="submit">Áp dụng <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
+        <p><strong>@p.LocalStart.ToString("dd/MM/yyyy") – @p.LocalEnd.AddDays(-1).ToString("dd/MM/yyyy")</strong><span>Đến hết ngày hôm nay · GMT+7</span></p>
+        <a class="dash-btn dash-refresh" asp-action="TongQuan" asp-route-range="@p.Range" aria-label="Làm mới số liệu"><i class="fa-solid fa-rotate" aria-hidden="true"></i> Làm mới</a>
+        <a class="dash-btn excel-export" data-excel-export asp-action="XuatBaoCaoDoanhThu" asp-route-range="@p.Range"><i class="fa-solid fa-file-excel" aria-hidden="true"></i><span>Xuất báo cáo Excel</span></a>
+    </form>
+    <div class="excel-feedback" role="status" aria-live="polite" hidden></div>
+    @if (Model.Unavailable) {
+        <section class="dash-panel dash-empty" role="alert"><h2>Chưa thể tải số liệu</h2><p>Vui lòng thử lại khi kết nối database được khôi phục.</p><a class="dash-btn" asp-action="TongQuan" asp-route-range="@p.Range">Thử lại</a></section>
+    } else {
+    <section class="dash-kpis" aria-label="Chỉ số trong kỳ">
+        @foreach (var card in kpis) {
+            <article class="dash-kpi" data-metric="@card.Key"><div class="dash-kpi-top"><h2>@card.Label</h2><span class="dash-icon"><i class="fa-solid fa-@card.Icon" aria-hidden="true"></i></span></div><strong class="dash-value">@card.Value</strong><p>@card.Note</p><small>@card.Compare</small></article>
+        }
+    </section>
+    <p class="dash-method">Kỳ trước có cùng số ngày, liền trước kỳ đã chọn. Chỉ số bán hàng tính đơn <strong>Đã giao</strong>, gồm cả COD chưa xác nhận thu tiền; loại đơn hủy. Trạng thái phản ánh hiện tại.</p>
+    <div class="dash-charts">
+        <section class="dash-panel dash-value-chart">
+            <div class="dash-panel-head"><div><p class="dash-eyebrow">GIÁ TRỊ ĐƠN ĐÃ GIAO</p><h2>Nhịp bán hàng trong kỳ</h2></div><span class="dash-tag">@(p.Range=="year" ? "Theo tháng" : "Theo ngày") · VNĐ</span></div>
+            <p class="dash-caption">Tổng thanh toán đã lưu của đơn đã giao, gồm phí ship nếu có, nhóm theo ngày đặt hàng tại Việt Nam.</p>
+            <div class="dash-chart" data-chart>
+                <div class="dash-chart-scale"><span>@OrderWorkflow.Money(maximum==1 && Model.DeliveredValue==0 ? 0 : maximum)</span><span>0 đ</span></div>
+                <svg viewBox="0 0 900 240" class="dash-svg" role="group" aria-labelledby="valueChartTitle valueChartDesc">
+                    <title id="valueChartTitle">Giá trị đơn đã giao theo thời gian</title><desc id="valueChartDesc">Dữ liệu từng mốc ở bảng bên dưới. Giá trị dựa trên ngày đặt hàng, không thể hiện doanh thu thực thu.</desc>
+                    <line x1="0" y1="204" x2="900" y2="204" class="dash-gridline" />
+                    <line x1="0" y1="104" x2="900" y2="104" class="dash-gridline" />
+                    <line x1="0" y1="4" x2="900" y2="4" class="dash-gridline" />
+                    @for (var i=0;i<Model.Points.Count;i++) {
+                        var point=Model.Points[i];var slot=900m/Model.Points.Count;var height=point.Value/maximum*190;var x=i*slot+slot*.18m;
+                        <rect x="@Svg(x)" y="@Svg(204-Math.Max(height,2))" width="@Svg(slot*.64m)" height="@Svg(Math.Max(height,2))" rx="3" class="dash-bar" tabindex="0" role="button" aria-pressed="false" aria-label="@point.Label: @OrderWorkflow.Money(point.Value)" data-label="@point.Label" data-value="@OrderWorkflow.Money(point.Value)"><title>@point.Label: @OrderWorkflow.Money(point.Value)</title></rect>
+                        @if (i%Math.Max(1,(int)Math.Ceiling(Model.Points.Count/6d))==0 || i==Model.Points.Count-1) { <g><text x="@Svg(i*slot+slot/2)" y="232" text-anchor="middle" class="dash-axis">@point.Label</text></g> }
+                    }
+                </svg>
+                <div class="dash-chart-tooltip" role="tooltip" hidden></div>
+            </div>
+            <p class="dash-chart-selection" data-chart-selection role="status" aria-live="polite">Chọn một cột để xem giá trị của ngày hoặc tháng đó.</p>
+            @if (Model.DeliveredValue==0) { <p class="dash-chart-empty">Chưa có giá trị bán hàng từ đơn đã giao trong kỳ.</p> }
+            <details class="dash-data"><summary>Xem bảng dữ liệu biểu đồ</summary><div class="dash-table-wrap"><table><caption class="dash-sr-only">Giá trị đơn đã giao trong kỳ, VNĐ</caption><thead><tr><th scope="col">@(p.Range=="year" ? "Tháng" : "Ngày")</th><th scope="col">Giá trị đơn đã giao</th></tr></thead><tbody>@foreach (var point in Model.Points) { <tr data-point="@point.Key" data-amount="@point.Value.ToString(CultureInfo.InvariantCulture)"><td>@point.Label</td><td>@OrderWorkflow.Money(point.Value)</td></tr> }</tbody></table></div></details>
+        </section>
+        <section class="dash-panel dash-statuses"><div class="dash-panel-head"><div><p class="dash-eyebrow">ĐƠN HÀNG TRONG KỲ</p><h2>Trạng thái đơn hàng</h2></div></div><p class="dash-caption">@Number(Model.Orders) đơn đặt trong kỳ</p>
+            @foreach (var status in Model.Statuses) {
+                var share=Model.Orders==0 ? 0 : status.Count*100m/Model.Orders;
+                <a class="dash-status-row" asp-controller="DonHang" asp-action="QuanLyDonHang" asp-route-status="@((int)status.Status)" data-status="@((int)status.Status)" data-count="@status.Count"><span><span class="dash-status-dot @OrderWorkflow.Tone(status.Status)"></span>@OrderWorkflow.Label(status.Status)<strong>@Number(status.Count)</strong></span><span class="dash-status-track" aria-hidden="true"><span style="width:@Svg(share)%"></span></span></a>
+            }
+            @if (Model.Orders==0) { <p class="dash-caption">Chưa có đơn hàng trong kỳ.</p> }
+            <p class="dash-caption">Chọn trạng thái để mở danh sách đơn tương ứng, toàn thời gian.</p>
+        </section>
+    </div>
+    <section class="dash-panel dash-recent"><div class="dash-panel-head"><div><p class="dash-eyebrow">THEO KHOẢNG THỜI GIAN ĐÃ CHỌN</p><h2>Đơn hàng gần đây</h2></div><a class="dash-link" asp-controller="DonHang" asp-action="QuanLyDonHang">Xem tất cả đơn hàng →</a></div>
+        @if (Model.RecentOrders.Count==0) { <div class="dash-empty"><i class="fa-regular fa-folder-open" aria-hidden="true"></i><p>Chưa có đơn hàng trong kỳ.</p></div> } else {
+            <div class="dash-table-wrap"><table><caption class="dash-sr-only">Bảy đơn mới nhất trong kỳ</caption><thead><tr><th scope="col">Đơn hàng</th><th scope="col">Khách hàng</th><th scope="col">Ngày đặt · GMT+7</th><th scope="col">Tổng tiền</th><th scope="col">Trạng thái</th><th scope="col">Thanh toán</th><th scope="col">Thao tác</th></tr></thead><tbody>
+            @foreach (var order in Model.RecentOrders) {
+                <tr data-recent-order="@order.Id"><td class="dash-code">@OrderWorkflow.Code(order.Id)</td><td>@order.CustomerName</td><td>@DashboardPeriod.LocalTime(order.CreatedAt)</td><td class="dash-money">@OrderWorkflow.Money(order.Total)</td><td><span class="dash-badge @OrderWorkflow.Tone(order.Status)">@OrderWorkflow.Label(order.Status)</span></td><td><span class="dash-payment">@PaymentMethods.Status(order.IsPaid,order.PaymentMethod,order.CustomerTransferNotifiedAt)</span></td><td><a class="dash-btn" asp-controller="DonHang" asp-action="ChiTietDonHang" asp-route-id="@order.Id" aria-label="Xem đơn hàng @OrderWorkflow.Code(order.Id)">Xem đơn hàng</a></td></tr>
+            }
+            </tbody></table></div>
+        }
+    </section>
+    <div class="dash-products">
+        <section class="dash-panel"><div class="dash-panel-head"><div><p class="dash-eyebrow">ĐƠN ĐÃ GIAO TRONG KỲ</p><h2>Sản phẩm bán chạy</h2></div><span class="dash-tag">Top 5</span></div>
+            @if (Model.BestSellers.Count==0) { <div class="dash-empty"><i class="fa-solid fa-seedling" aria-hidden="true"></i><p>Chưa có dữ liệu bán hàng trong kỳ.</p></div> }
+            @for (var i=0;i<Model.BestSellers.Count;i++) { var product=Model.BestSellers[i];
+                <div class="dash-product-row" data-best-id="@product.Id" data-best-name="@product.Name" data-sold="@product.Sold"><span class="dash-rank">@(i+1)</span><img src="@product.ImageUrl" alt="" width="48" height="56" loading="lazy" data-dashboard-image /><div class="dash-product-info">@if (product.Id.HasValue) { <a class="dash-link" asp-controller="SanPham" asp-action="ChiTietSanPham" asp-route-id="@product.Id">@product.Name</a> } else { <strong>@product.Name</strong> }<small>@(product.Price.HasValue ? "Giá hiện tại: "+OrderWorkflow.Money(product.Price.Value) : "Sản phẩm không còn trong danh mục")</small></div><strong class="dash-sold">@Number(product.Sold)<small>đã bán</small></strong></div>
+            }
+        </section>
+        <section class="dash-panel" id="stockAlerts"><div class="dash-panel-head"><div><p class="dash-eyebrow">TỒN KHO HIỆN TẠI · KHÔNG LỌC THEO NGÀY</p><h2>Cảnh báo tồn kho</h2></div><span class="dash-tag">Ngưỡng ≤ @Model.StockThreshold</span></div><p class="dash-caption">@Model.OutOfStock hết hàng · @Model.LowStock sắp hết · @Model.ProductCount sản phẩm</p>
+            @if (Model.StockAlerts.Count==0) { <div class="dash-empty"><i class="fa-regular fa-circle-check" aria-hidden="true"></i><p>@(Model.ProductCount==0 ? "Chưa có sản phẩm để theo dõi tồn kho." : "Không có sản phẩm tồn kho thấp.")</p></div> }
+            @foreach (var product in Model.StockAlerts) {
+                <div class="dash-product-row" data-stock-id="@product.Id" data-stock="@product.Stock"><img src="@product.ImageUrl" alt="" width="48" height="56" loading="lazy" data-dashboard-image /><div class="dash-product-info"><a class="dash-link" asp-controller="SanPham" asp-action="SuaSanPham" asp-route-id="@product.Id">@product.Name</a><small>@(product.Stock==0 ? "Hết hàng" : "Sắp hết hàng") · còn @product.Stock</small></div><a class="dash-btn" asp-controller="SanPham" asp-action="SuaSanPham" asp-route-id="@product.Id" aria-label="Cập nhật sản phẩm @product.Name">Cập nhật</a></div>
+            }
+            <a class="dash-link dash-section-link" asp-controller="SanPham" asp-action="QuanLySanPham">Xem tất cả sản phẩm →</a>
+        </section>
+    </div>
+    <section class="dash-panel dash-work"><div class="dash-panel-head"><div><p class="dash-eyebrow">HIỆN TRẠNG TOÀN THỜI GIAN</p><h2>Cần xử lý</h2></div><span class="dash-tag">Không bị giới hạn bởi bộ lọc ngày</span></div>
+        <div class="dash-work-grid">
+            @if (Model.PendingNow>0) { <a class="dash-work-item" asp-controller="DonHang" asp-action="QuanLyDonHang" asp-route-status="0" data-task="pending" data-count="@Model.PendingNow"><i class="fa-regular fa-clock" aria-hidden="true"></i><span><strong>@Model.PendingNow đơn chờ xác nhận</strong><small>Mở danh sách chờ xác nhận →</small></span></a> }
+            @if (Model.ProcessingNow>0) { <a class="dash-work-item" asp-controller="DonHang" asp-action="QuanLyDonHang" asp-route-status="4" data-task="processing" data-count="@Model.ProcessingNow"><i class="fa-solid fa-box-open" aria-hidden="true"></i><span><strong>@Model.ProcessingNow đơn đang xử lý</strong><small>Kiểm tra việc chuẩn bị hàng →</small></span></a> }
+            @if (Model.UnpaidCodNow>0) { <a class="dash-work-item" asp-controller="DonHang" asp-action="ChiTietDonHang" asp-route-id="@Model.UnpaidCodId" data-task="cod" data-count="@Model.UnpaidCodNow"><i class="fa-solid fa-money-bill-transfer" aria-hidden="true"></i><span><strong>@Model.UnpaidCodNow đơn đã giao chưa xác nhận thu COD</strong><small>Mở một đơn cần đối chiếu tiền →</small></span></a> }
+            @if (Model.PendingTransfersNow>0) { <a class="dash-work-item" asp-controller="DonHang" asp-action="ChiTietDonHang" asp-route-id="@Model.PendingTransferId" data-task="transfer" data-count="@Model.PendingTransfersNow"><i class="fa-solid fa-building-columns" aria-hidden="true"></i><span><strong>@Model.PendingTransfersNow thông báo chuyển khoản cần đối chiếu</strong><small>Mở một đơn VietQR chờ kiểm tra →</small></span></a> }
+            @if (Model.OutOfStock+Model.LowStock>0) { <a class="dash-work-item" href="#stockAlerts" data-task="stock" data-count="@(Model.OutOfStock+Model.LowStock)"><i class="fa-solid fa-boxes-stacked" aria-hidden="true"></i><span><strong>@(Model.OutOfStock+Model.LowStock) sản phẩm cần bổ sung</strong><small>Xem cảnh báo tồn kho ở trên ↑</small></span></a> }
+        </div>
+        @if (Model.PendingNow+Model.ProcessingNow+Model.UnpaidCodNow+Model.OutOfStock+Model.LowStock+Model.PendingTransfersNow==0) { <p class="dash-caption">Không có công việc cần xử lý trong các nhóm đang theo dõi.</p> }
+    </section>
+    <nav class="dash-shortcuts" aria-label="Điều hướng nhanh"><a class="dash-btn" asp-controller="SanPham" asp-action="QuanLySanPham"><i class="fa-solid fa-seedling" aria-hidden="true"></i> Quản lý sản phẩm</a><a class="dash-btn" asp-controller="DanhMuc" asp-action="QuanLyDanhMuc"><i class="fa-solid fa-tags" aria-hidden="true"></i> Quản lý danh mục</a><a class="dash-btn" asp-controller="DonHang" asp-action="QuanLyDonHang"><i class="fa-solid fa-receipt" aria-hidden="true"></i> Quản lý đơn hàng</a><a class="dash-btn" asp-controller="NguoiDung" asp-action="QuanLyNguoiDung"><i class="fa-solid fa-user-shield" aria-hidden="true"></i> Người dùng &amp; phân quyền</a></nav>
+    }
+</div>
+@section Scripts { <script src="~/js/admin-dashboard.js" asp-append-version="true" defer></script> }

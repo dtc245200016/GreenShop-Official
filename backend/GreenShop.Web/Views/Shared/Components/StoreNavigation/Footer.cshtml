@@ -1,0 +1,10 @@
+@model StoreNavigationViewModel
+<footer class="shop-footer">
+    <div class="shop-container footer-grid">
+        <div class="footer-brand"><a class="shop-brand" asp-area="" asp-controller="Home" asp-action="Index"><i class="fa-solid fa-leaf" aria-hidden="true"></i><span>GreenShop<small>SỐNG XANH MỖI NGÀY</small></span></a><p>Một chút xanh,<br />thêm nhiều bình yên.</p><span class="footer-leaf" aria-hidden="true"></span></div>
+        <nav aria-label="Khám phá GreenShop"><h2>Khám phá</h2><a asp-area="" asp-controller="Home" asp-action="Index">Trang chủ</a><a asp-area="" asp-controller="SanPham" asp-action="CuaHang">Cửa hàng</a>@if (!User.IsInRole("Admin")) { <a asp-area="" asp-controller="GioHang" asp-action="QuanLyGioHang">Giỏ hàng</a> }</nav>
+        <nav aria-label="Danh mục footer"><h2>Danh mục</h2>@foreach (var category in Model.Categories.Take(5)) { <a asp-area="" asp-controller="SanPham" asp-action="CuaHang" asp-route-categoryId="@category.Id">@category.Name</a> }<a asp-area="" asp-controller="SanPham" asp-action="CuaHang">Tất cả sản phẩm ↗</a></nav>
+        <nav aria-label="Tài khoản footer"><h2>Tài khoản</h2><button type="button" class="shop-text-link" data-chat-mode="shop" aria-controls="hybrid-chat">Liên hệ cửa hàng</button>@if (User.IsInRole("Admin")) { <p class="footer-note">@User.Identity?.Name</p><a asp-area="Admin" asp-controller="Admin" asp-action="TongQuan">Trang quản trị</a> } else { @if (User.Identity?.IsAuthenticated == true) { <a asp-area="" asp-controller="ThanhToan" asp-action="DonHangCuaToi">Đơn hàng của tôi</a> } else { <a asp-area="" asp-controller="Account" asp-action="Login">Đăng nhập</a><a asp-area="" asp-controller="Account" asp-action="Register">Đăng ký</a> }<p class="footer-note">Chọn sản phẩm yêu thích.<br />Đặt hàng bằng COD.</p> }</nav>
+    </div>
+    <div class="shop-container footer-bottom"><small>© @DateTime.UtcNow.Year GreenShop · Đặng Quốc Trung</small><span>Mang thiên nhiên gần hơn.</span></div>
+</footer>

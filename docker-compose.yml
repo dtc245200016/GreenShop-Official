@@ -1,0 +1,119 @@
+
+services:
+  db:
+    image: mysql:8.0@sha256:7dcddc01f13bab2f15cde676d44d01f61fc9f99fe7785e86196dfc07d358ae2b
+    container_name: greenshop_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in .env}
+      MYSQL_DATABASE: greenshop
+      MYSQL_USER: greenshop_app
+      MYSQL_PASSWORD: ${MYSQL_APP_PASSWORD:?Set MYSQL_APP_PASSWORD in .env}
+    ports:
+      - "127.0.0.1:3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - app_net
+    healthcheck:
+      test: ["CMD-SHELL", 'MYSQL_PWD="$${MYSQL_ROOT_PASSWORD}" mysql --protocol=TCP -h 127.0.0.1 -uroot --database="$${MYSQL_DATABASE}" --execute="SELECT 1" --silent >/dev/null']
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 30s
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin@sha256:42a200db07b4e70fbf32c594ad4521cf16399b8e54bbb5adceae98e7566dfbeb
+    container_name: greenshop_phpmyadmin
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+    ports:
+      - "127.0.0.1:8080:80"
+    networks:
+      - app_net
+    healthcheck:
+      test: ["CMD", "php", "-r", '$$s=@fsockopen("127.0.0.1",80,$$errno,$$error,2); if(!$$s)exit(1); fwrite($$s,"GET / HTTP/1.0\r\nHost: localhost\r\nConnection: close\r\n\r\n"); stream_set_timeout($$s,2); $$line=fgets($$s); fclose($$s); exit(strpos($$line ?: ""," 200 ") === false ? 1 : 0);']
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 15s
+
+  web_app:
+    build:
+      context: ./backend
+      dockerfile: GreenShop.Web/Dockerfile
+      target: final
+    container_name: greenshop_web
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+      - AiChat__Enabled=${AI_CHAT_ENABLED:-false}
+      - AiChat__FreeTierVerified=${AI_CHAT_FREE_TIER_VERIFIED:-false}
+      - AiChat__FreeTierVerifiedModel=${AI_CHAT_FREE_TIER_VERIFIED_MODEL:-}
+      - AiChat__FreeTierVerifiedUntil=${AI_CHAT_FREE_TIER_VERIFIED_UNTIL:-}
+      - AiChat__RequestsPerDay=${AI_CHAT_REQUESTS_PER_DAY:-20}
+      - AiChat__TokensPerMinute=${AI_CHAT_TOKENS_PER_MINUTE:-30000}
+      - AiChat__TokensPerDay=${AI_CHAT_TOKENS_PER_DAY:-100000}
+      - AiChat__MaxInputTokens=${AI_CHAT_MAX_INPUT_TOKENS:-12000}
+      - AiChat__Provider=${AI_CHAT_PROVIDER:-Gemini}
+      - AiChat__Model=${AI_CHAT_MODEL:-}
+      - AiChat__ApiKey=${AI_CHAT_API_KEY:-}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - AiChat__TimeoutSeconds=${AI_CHAT_TIMEOUT_SECONDS:-20}
+      - AiChat__RequestsPerMinute=${AI_CHAT_REQUESTS_PER_MINUTE:-5}
+      - AiChat__MaxOutputTokens=${AI_CHAT_MAX_OUTPUT_TOKENS:-500}
+      - AiChat__HistoryTurns=${AI_CHAT_HISTORY_TURNS:-4}
+      - ConnectionStrings__DefaultConnection=Server=db;Database=greenshop;Uid=greenshop_app;Pwd=${MYSQL_APP_PASSWORD:?Set MYSQL_APP_PASSWORD in .env};
+    volumes:
+      - data_protection_keys:/app/keys
+      - product_images:/app/wwwroot/uploads/products
+    ports:
+      - "127.0.0.1:5000:8080"
+    networks:
+      - app_net
+    healthcheck:
+      test: ["CMD", "dotnet", "GreenShop.Web.dll", "--healthcheck"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  nginx:
+    image: nginx:alpine@sha256:df221db836e1754089190208cee7eeda94f233197056426eda74a43ab1abeac2
+    container_name: nginx_server
+    restart: always
+    depends_on:
+      web_app:
+        condition: service_healthy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    networks:
+      - app_net
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null --no-check-certificate https://127.0.0.1/health/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 15s
+
+volumes:
+  mysql_data:
+  data_protection_keys:
+  product_images:
+
+networks:
+  app_net:
+    driver: bridge

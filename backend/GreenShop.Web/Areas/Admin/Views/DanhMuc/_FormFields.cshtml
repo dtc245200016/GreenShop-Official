@@ -1,0 +1,25 @@
+@model CategoryFormViewModel
+
+<div asp-validation-summary="All" class="text-danger mb-4" role="alert"></div>
+<div class="mb-4">
+    <label asp-for="Name" class="form-label fw-semibold"></label>
+    <input asp-for="Name" class="form-control form-control-lg" maxlength="100" required placeholder="Ví dụ: Cây trong nhà" aria-describedby="categoryNameHelp" />
+    <span asp-validation-for="Name" class="text-danger small"></span>
+    <div id="categoryNameHelp" class="form-text">Tối đa 100 ký tự. Tên không phân biệt hoa thường, có phân biệt dấu.</div>
+</div>
+<div class="mb-4">
+    <label asp-for="Description" class="form-label fw-semibold"></label>
+    <textarea asp-for="Description" class="form-control" rows="5" maxlength="500" placeholder="Mô tả ngắn để dễ nhận biết danh mục" data-character-count="descriptionCount" aria-describedby="descriptionCount"></textarea>
+    <div class="d-flex justify-content-between gap-2 mt-2">
+        <span asp-validation-for="Description" class="text-danger small"></span>
+        <span id="descriptionCount" class="small text-muted" aria-live="polite">@(Model.Description?.Length ?? 0)/500</span>
+    </div>
+</div>
+<div class="category-status-setting p-3 mb-4">
+    <div class="form-check form-switch mb-1">
+        <input asp-for="IsActive" class="form-check-input" role="switch" aria-describedby="categoryStatusHelp" />
+        <label asp-for="IsActive" class="form-check-label fw-semibold"></label>
+    </div>
+    <span asp-validation-for="IsActive" class="text-danger small"></span>
+    <p id="categoryStatusHelp" class="small text-muted mb-0">Danh mục hoạt động có thể được chọn cho sản phẩm mới. Ngừng hoạt động vẫn giữ các sản phẩm đã liên kết.</p>
+</div>

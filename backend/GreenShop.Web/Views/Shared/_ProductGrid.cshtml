@@ -1,0 +1,9 @@
+@model StoreCatalogViewModel
+@if (Model.Products.Count == 0)
+{
+    <section class="shop-empty catalog-empty" aria-labelledby="catalog-empty-title" role="status"><i class="fa-solid fa-seedling" aria-hidden="true"></i><div><h3 id="catalog-empty-title">@(string.IsNullOrEmpty(Model.Search) ? "Chưa có sản phẩm" : "Chưa tìm thấy sản phẩm phù hợp")</h3><p>@(!string.IsNullOrEmpty(Model.Search) ? "Thử một từ khóa khác hoặc xóa tìm kiếm để khám phá lại." : Model.CategoryId.HasValue ? "Danh mục này chưa có sản phẩm. Hãy ghé một danh mục khác." : "Cửa hàng đang chờ những sản phẩm mới. Bạn có thể quay lại sau.")</p></div>@if (!string.IsNullOrEmpty(Model.Search)) { <a class="shop-btn secondary" asp-controller="SanPham" asp-action="CuaHang" asp-route-categoryId="@Model.CategoryId" asp-route-sort="@Model.Sort">Xóa tìm kiếm <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a> } else { <a class="shop-btn secondary" asp-controller="SanPham" asp-action="CuaHang">Xem tất cả sản phẩm <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a> }</section>
+}
+else
+{
+    <div class="product-grid @(Model.Products.Count == 1 ? "product-grid-single" : "")">@foreach (var product in Model.Products) { <partial name="_ProductCard" model="product" /> }</div>
+}

@@ -1,0 +1,61 @@
+@model AdminOrderListViewModel
+@{
+    ViewData["Title"] = "Quản lý đơn hàng";
+    var f = Model.Filter;
+    string ListUrl(int pageNumber, OrderStatus? state) => Url.Action("QuanLyDonHang", new {
+        search = f.Search, customerId = f.CustomerId, status = state.HasValue ? (int?)state.Value : null,
+        fromDate = f.FromDate?.ToString("yyyy-MM-dd"), toDate = f.ToDate?.ToString("yyyy-MM-dd"),
+        sort = f.Sort, page = pageNumber, pageSize = f.PageSize, paymentMethod=f.PaymentMethod,paymentState=f.PaymentState
+    })!;
+    var stats = new[] {
+        ("Tổng đơn hàng", Model.TotalCount, "receipt", "all"),
+        ("Chờ xác nhận", Model.Count(OrderStatus.Pending), "clock", "pending"),
+        ("Xác nhận / xử lý", Model.Count(OrderStatus.Confirmed) + Model.Count(OrderStatus.Processing), "box-open", "processing"),
+        ("Đang giao", Model.Count(OrderStatus.Shipping), "truck-fast", "shipping"),
+        ("Đã giao", Model.Count(OrderStatus.Completed), "circle-check", "delivered"),
+        ("Đã hủy", Model.Count(OrderStatus.Cancelled), "ban", "cancelled")
+    };
+}
+<section class="order-admin">
+    <nav class="order-breadcrumb" aria-label="Breadcrumb"><a asp-area="Admin" asp-controller="Admin" asp-action="Index">Tổng quan</a><span>/</span><span aria-current="page">Đơn hàng</span></nav>
+    <header class="order-page-header"><div><span class="order-eyebrow">GREENSHOP · VẬN HÀNH</span><h1>Quản lý đơn hàng</h1><p>Theo dõi từng đơn, xử lý đúng bước, giữ tồn kho nhất quán.</p></div><span class="order-context"><i class="fa-solid fa-database" aria-hidden="true"></i>Dữ liệu trực tiếp · UTC</span></header>
+    <partial name="_Feedback" />
+    <div class="order-stats" aria-label="Thống kê toàn bộ đơn hàng">
+        @foreach (var (label, count, icon, tone) in stats)
+        {
+            <article class="order-stat"><span class="order-stat-icon @tone"><i class="fa-solid fa-@icon" aria-hidden="true"></i></span><span>@label</span><strong>@count</strong></article>
+        }
+    </div>
+    <div class="order-panel">
+        <nav class="order-tabs" aria-label="Lọc trạng thái đơn hàng">
+            <a href="@ListUrl(1, null)" aria-current="@(!f.Status.HasValue ? "page" : null)">Tất cả <span>@Model.TotalCount</span></a>
+            @foreach (var state in OrderWorkflow.States)
+            {
+                <a href="@ListUrl(1, state)" aria-current="@(f.Status == state ? "page" : null)">@OrderWorkflow.Label(state) <span>@Model.Count(state)</span></a>
+            }
+        </nav>
+        <partial name="_BoLocDonHang" model="f" />
+        <div class="order-list-heading">
+            <div><h2>Danh sách đơn hàng</h2><p>@Model.MatchingCount kết quả
+                @if (f.HasFilters) { <span> theo bộ lọc</span> }
+            </p></div>
+            <div class="excel-toolbar"><span>Trang @f.Page / @Model.TotalPages</span><a class="order-btn secondary excel-export" data-excel-export href="@Url.Action("XuatExcelDonHang",new {search=f.Search,customerId=f.CustomerId,status=f.Status.HasValue ? (int?)f.Status.Value : null,fromDate=f.FromDate?.ToString("yyyy-MM-dd"),toDate=f.ToDate?.ToString("yyyy-MM-dd"),sort=f.Sort,paymentMethod=f.PaymentMethod,paymentState=f.PaymentState})"><i class="fa-solid fa-file-excel" aria-hidden="true"></i><span>Xuất Excel</span></a></div>
+        </div>
+        <p class="excel-hint">Xuất tất cả kết quả theo bộ lọc đã áp dụng, gồm cả các trang khác.</p>
+        <div class="excel-feedback" role="status" aria-live="polite" hidden></div>
+        @if(f.CustomerId.HasValue) { <p class="order-customer-filter">Đơn của tài khoản #@f.CustomerId · <a asp-area="Admin" asp-controller="NguoiDung" asp-action="ChiTietNguoiDung" asp-route-id="@f.CustomerId">Quay lại hồ sơ người dùng</a></p> }
+        @if (Model.Orders.Count == 0)
+        {
+            <div class="order-empty" role="status"><span><i class="fa-solid fa-box-open" aria-hidden="true"></i></span><h3>@(Model.TotalCount == 0 ? "Chưa có đơn hàng" : "Không tìm thấy đơn phù hợp")</h3><p>@(Model.TotalCount == 0 ? "Đơn mới từ checkout sẽ xuất hiện tại đây." : "Thử mã đơn hoặc khoảng ngày khác. Dữ liệu chỉ được lọc khi bạn chọn áp dụng.")</p>@if (f.HasFilters) { <a class="order-btn secondary" asp-action="QuanLyDonHang">Xóa bộ lọc</a> }</div>
+        }
+        else
+        {
+            <partial name="_BangDonHang" model="Model.Orders" />
+        }
+        <nav class="order-pagination" aria-label="Phân trang đơn hàng">
+            <span>@(Model.MatchingCount == 0 ? 0 : (f.Page - 1) * f.PageSize + 1)–@Math.Min(f.Page * f.PageSize, Model.MatchingCount) / @Model.MatchingCount đơn</span>
+            <div>@if (f.Page > 1) { <a class="order-btn secondary" href="@ListUrl(f.Page - 1, f.Status)">← Trước</a> }<span aria-current="page">@f.Page</span>@if (f.Page < Model.TotalPages) { <a class="order-btn secondary" href="@ListUrl(f.Page + 1, f.Status)">Tiếp →</a> }</div>
+        </nav>
+    </div>
+</section>
+@section Scripts { <script src="~/js/admin-orders.js" asp-append-version="true" defer></script> }

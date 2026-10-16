@@ -1,0 +1,14 @@
+@model IReadOnlyList<ProductReview>
+@if(Model.Count==0) { <p class="review-empty">Chưa có đánh giá. Nhận xét sẽ xuất hiện khi người mua đã nhận hàng và gửi đánh giá.</p> }
+@foreach(var review in Model) {
+    <article class="review-entry" data-review-id="@review.Id"><header><strong>@review.User.FullName</strong><span class="review-score" aria-label="@review.Stars trên 5 sao">@for(var star=1;star<=5;star++) { <span class="@(star<=review.Stars?"filled":"")" aria-hidden="true">★</span> }</span></header>
+    <small>Đã mua hàng · @DashboardPeriod.LocalTime(review.CreatedAt)</small><p class="review-content">@review.Content</p>
+    <div class="review-photos">@foreach(var url in new[]{review.Image1,review.Image2,review.Image3,review.Image4,review.Image5}.Where(u=>u!=null)) { <a href="@StoreDisplay.Image(url)" target="_blank" rel="noopener" aria-label="Xem ảnh đánh giá"><img src="@StoreDisplay.Image(url)" alt="Ảnh trải nghiệm sản phẩm của người mua" loading="lazy" width="110" height="110" /></a> }</div>
+    @if(!string.IsNullOrEmpty(review.ReplyContent)){
+        <aside class="review-reply" aria-label="Phản hồi từ GreenShop" data-review-reply>
+            <header><strong><i class="fa-solid fa-seedling" aria-hidden="true"></i> Phản hồi từ GreenShop</strong><small>@DashboardPeriod.LocalTime(review.ReplyUpdatedAt??review.ReplyCreatedAt??review.CreatedAt)</small></header>
+            <p>@review.ReplyContent</p>
+        </aside>
+    }
+    </article>
+}

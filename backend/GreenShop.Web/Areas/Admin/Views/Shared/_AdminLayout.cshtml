@@ -1,0 +1,261 @@
+@{
+    var engagementAction = string.Equals(ViewContext.RouteData.Values["controller"]?.ToString(), "KhachHang", StringComparison.OrdinalIgnoreCase) ? ViewContext.RouteData.Values["action"]?.ToString() : null;
+    var isProducts = string.Equals(ViewContext.RouteData.Values["controller"]?.ToString(), "SanPham", StringComparison.OrdinalIgnoreCase);
+    var isCategories = string.Equals(ViewContext.RouteData.Values["controller"]?.ToString(), "DanhMuc", StringComparison.OrdinalIgnoreCase);
+    var isOrders = string.Equals(ViewContext.RouteData.Values["controller"]?.ToString(), "DonHang", StringComparison.OrdinalIgnoreCase);
+    var isUsers = string.Equals(ViewContext.RouteData.Values["controller"]?.ToString(), "NguoiDung", StringComparison.OrdinalIgnoreCase);
+    var isDashboard = string.Equals(ViewContext.RouteData.Values["controller"]?.ToString(), "Admin", StringComparison.OrdinalIgnoreCase);
+    var isSettings = string.Equals(ViewContext.RouteData.Values["controller"]?.ToString(), "CaiDatCuaHang", StringComparison.OrdinalIgnoreCase);
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - GreenShop Admin</title>
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" asp-append-version="true">
+    <link rel="stylesheet" href="~/lib/fontawesome/css/all.min.css" asp-append-version="true">
+    @if (isOrders || isUsers) { <link rel="stylesheet" href="~/css/admin-orders.css" asp-append-version="true" /> }
+    @if (isUsers) { <link rel="stylesheet" href="~/css/admin-users.css" asp-append-version="true" /> }
+    @if (isDashboard) { <link rel="stylesheet" href="~/css/admin-dashboard.css" asp-append-version="true" /> }
+    <link rel="preload" href="~/fonts/be-vietnam-pro/be-vietnam-pro-400-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="~/fonts/be-vietnam-pro/be-vietnam-pro-400-vietnamese.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="~/css/admin-fonts.css" asp-append-version="true" />
+    @if(isSettings || isOrders) { <link rel="stylesheet" href="~/css/payment-shipping.css" asp-append-version="true" /> }
+    @if (isOrders || isProducts || isDashboard) { <link rel="stylesheet" href="~/css/admin-excel.css" asp-append-version="true" /> }
+    <style>
+        :root {
+            --admin-sidebar-width: 260px;
+            --admin-navbar-height: 64px;
+            --admin-sidebar-bg: #17212b;
+            --admin-accent: #35a56f;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #f4f7f6;
+            color: #25313b;
+        }
+
+        .admin-topbar {
+            height: var(--admin-navbar-height);
+            background: #fff;
+            z-index: 1030;
+        }
+
+        .admin-brand {
+            width: var(--admin-sidebar-width);
+            color: #25313b;
+        }
+
+        .admin-brand:hover {
+            color: var(--admin-accent);
+        }
+
+        .admin-logout-button {
+            position: relative;
+            z-index: 1;
+            cursor: pointer;
+            transition: color .2s ease, background-color .2s ease, border-color .2s ease, box-shadow .2s ease;
+        }
+
+        .admin-logout-button:hover,
+        .admin-logout-button:focus-visible {
+            box-shadow: 0 0 0 .2rem rgba(220, 53, 69, .2);
+        }
+
+        .admin-sidebar {
+            position: fixed;
+            top: var(--admin-navbar-height);
+            bottom: 0;
+            left: 0;
+            z-index: 1020;
+            width: var(--admin-sidebar-width);
+            overflow-y: auto;
+            padding: 1.5rem 1rem;
+            background: var(--admin-sidebar-bg);
+            transition: transform .2s ease-in-out;
+        }
+
+        .admin-sidebar-label {
+            padding: 0 .75rem;
+            color: #9aa8b5;
+            font-size: .72rem;
+            font-weight: 700;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+
+        .admin-sidebar .nav-link {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            margin: .25rem 0;
+            padding: .75rem;
+            border-radius: .5rem;
+            color: #d6dee5;
+        }
+
+        .admin-sidebar .nav-link > i {
+            width: 1.25rem;
+            text-align: center;
+        }
+
+        .admin-sidebar .nav-link.active,
+        .admin-sidebar .nav-link:not(.disabled):hover {
+            background: rgba(53, 165, 111, .18);
+            color: #78d5a4;
+        }
+
+        .admin-sidebar .nav-link.disabled {
+            color: #87939e;
+            cursor: not-allowed;
+            opacity: .75;
+        }
+
+        .admin-main {
+            min-height: 100vh;
+            margin-left: var(--admin-sidebar-width);
+            padding: calc(var(--admin-navbar-height) + 1.5rem) 1.5rem 1.5rem;
+        }
+
+        .admin-overlay {
+            display: none;
+        }
+
+        @@media (max-width: 767.98px) {
+            .admin-topbar .container-fluid { flex-wrap: nowrap; gap: .5rem; }
+            .admin-topbar .gap-3 { gap: .5rem !important; }
+            .admin-brand {
+                width: auto;
+                font-size: 1rem;
+                margin-right: 0;
+            }
+
+            .admin-sidebar {
+                transform: translateX(-100%);
+            }
+
+            body.admin-sidebar-open .admin-sidebar {
+                transform: translateX(0);
+            }
+
+            body.admin-sidebar-open .admin-overlay {
+                position: fixed;
+                inset: var(--admin-navbar-height) 0 0;
+                z-index: 1010;
+                display: block;
+                background: rgba(0, 0, 0, .4);
+            }
+
+            .admin-main {
+                margin-left: 0;
+                padding: calc(var(--admin-navbar-height) + 1rem) 1rem 1rem;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="~/css/admin-theme.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/customer-engagement.css" asp-append-version="true" />
+</head>
+<body class="admin-shell @(isProducts ? "admin-products" : "")">
+    <nav class="navbar fixed-top admin-topbar shadow-sm px-3">
+        <div class="container-fluid px-0">
+            <div class="d-flex align-items-center">
+                <button class="btn btn-outline-secondary d-md-none me-2"
+                        type="button"
+                        id="adminSidebarToggle"
+                        aria-label="Mở menu quản trị"
+                        aria-expanded="false"
+                        aria-controls="adminSidebar">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <a class="navbar-brand admin-brand fw-bold mb-0" asp-area="Admin" asp-controller="Admin" asp-action="TongQuan">
+                    <span class="admin-brand-mark"><i class="fa-solid fa-seedling" aria-hidden="true"></i></span><span class="admin-brand-copy">GreenShop<small>Không gian quản trị</small></span>
+                </a>
+            </div>
+
+            <div class="d-flex align-items-center gap-3">
+                <span class="admin-current-user d-none d-lg-flex">
+                    <span class="admin-user-icon"><i class="fa-regular fa-user" aria-hidden="true"></i></span><span><small>Xin chào,</small><strong>@(User.Identity?.Name ?? "Quản trị viên")</strong></span>
+                </span>
+                <div class="dropdown admin-settings-menu">
+                    <button class="btn btn-outline-success btn-sm dropdown-toggle" id="adminSettingsMenu" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Cài đặt cửa hàng"><i class="fa-solid fa-gear" aria-hidden="true"></i></button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminSettingsMenu"><li><a class="dropdown-item @(isSettings ? "active" : "")" asp-area="Admin" asp-controller="CaiDatCuaHang" asp-action="QuanLyThanhToanVanChuyen"><i class="fa-solid fa-sliders" aria-hidden="true"></i>Cài đặt thanh toán &amp; vận chuyển</a></li><li><a class="dropdown-item" asp-area="Admin" asp-controller="KhachHang" asp-action="Slider">Slider trang chủ</a></li></ul>
+                </div>
+                @await Component.InvokeAsync("AdminAlerts")
+                <a class="btn btn-outline-success btn-sm"
+                   aria-label="Xem website"
+                   href="@Url.Action("Index", "Home", new { area = "", portal = "admin" })">
+                    <i class="fa-solid fa-globe me-1"></i><span class="d-none d-lg-inline">Xem website</span>
+                </a>
+                <form id="logoutForm"
+                      action="@Url.RouteUrl(GreenShop.Web.Services.PortalAuthentication.AdminLogoutRoute)"
+                      method="post"
+                      class="d-inline m-0 p-0">
+                    @Html.AntiForgeryToken()
+                    <button type="submit"
+                            class="btn btn-outline-danger btn-sm admin-logout-button"
+                            aria-label="Đăng xuất">
+                        <i class="fa-solid fa-right-from-bracket me-1"></i><span class="d-none d-lg-inline">Đăng xuất</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <aside class="admin-sidebar" id="adminSidebar" aria-label="Menu quản trị">
+        <div class="admin-sidebar-label mb-2">Quản lý cửa hàng</div>
+        <nav class="nav flex-column">
+            <a class="nav-link @(isDashboard ? "active" : "")" asp-area="Admin" asp-controller="Admin" asp-action="TongQuan" aria-current="@(isDashboard ? "page" : null)">
+                <i class="fa-solid fa-gauge-high"></i><span>Tổng quan</span>
+            </a>
+            <a class="nav-link @(isProducts ? "active" : "")" asp-area="Admin" asp-controller="SanPham" asp-action="QuanLySanPham" aria-current="@(isProducts ? "page" : null)">
+                <i class="fa-solid fa-box-open"></i><span class="flex-grow-1">Quản lý Sản phẩm</span>
+            </a>
+            <a class="nav-link @(isCategories ? "active" : "")" asp-area="Admin" asp-controller="DanhMuc" asp-action="QuanLyDanhMuc" aria-current="@(isCategories ? "page" : null)">
+                <i class="fa-solid fa-tags"></i><span class="flex-grow-1">Quản lý Danh mục</span>
+            </a>
+            <a class="nav-link @(isOrders ? "active" : "")" asp-area="Admin" asp-controller="DonHang" asp-action="QuanLyDonHang" aria-current="@(isOrders ? "page" : null)">
+                <i class="fa-solid fa-receipt" aria-hidden="true"></i><span class="flex-grow-1">Quản lý Đơn hàng</span>@await Component.InvokeAsync("AdminAlerts",new{kind="orders"})
+            </a>
+            <a class="nav-link @(isUsers ? "active" : "")" asp-area="Admin" asp-controller="NguoiDung" asp-action="QuanLyNguoiDung" aria-current="@(isUsers ? "page" : null)">
+                <i class="fa-solid fa-users-gear" aria-hidden="true"></i><span class="flex-grow-1">Người dùng &amp; Phân quyền</span>
+            </a>
+            <a class="nav-link @(engagementAction is "TinNhan" or "TroChuyen" ? "active" : "")" aria-current="@(engagementAction is "TinNhan" or "TroChuyen" ? "page" : null)" asp-area="Admin" asp-controller="KhachHang" asp-action="TinNhan"><i class="fa-regular fa-comments" aria-hidden="true"></i><span class="flex-grow-1">Tin nhắn khách hàng</span>@await Component.InvokeAsync("AdminAlerts",new{kind="messages"})</a>
+            <a class="nav-link @(engagementAction == "DanhGia" ? "active" : "")" aria-current="@(engagementAction == "DanhGia" ? "page" : null)" asp-area="Admin" asp-controller="KhachHang" asp-action="DanhGia"><i class="fa-regular fa-star" aria-hidden="true"></i><span>Đánh giá khách hàng</span></a>
+            <a class="nav-link @(engagementAction == "Slider" ? "active" : "")" aria-current="@(engagementAction == "Slider" ? "page" : null)" asp-area="Admin" asp-controller="KhachHang" asp-action="Slider"><i class="fa-regular fa-images" aria-hidden="true"></i><span>Slider trang chủ</span></a>
+        </nav>
+        <div class="admin-sidebar-note"><span class="admin-sidebar-leaf"><i class="fa-solid fa-leaf" aria-hidden="true"></i></span><strong>Mỗi ngày, thêm xanh.</strong><p>Chăm chút cửa hàng của bạn<br />từ những điều nhỏ nhất.</p></div>
+    </aside>
+
+    <button class="admin-overlay border-0" id="adminSidebarOverlay" type="button" aria-label="Đóng menu quản trị"></button>
+
+    <main class="admin-main" role="main">
+        <div class="admin-page-content">
+        @RenderBody()
+        </div>
+    </main>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
+    <script>
+        const sidebarToggle = document.getElementById("adminSidebarToggle");
+        const sidebarOverlay = document.getElementById("adminSidebarOverlay");
+
+        function setSidebarOpen(isOpen) {
+            document.body.classList.toggle("admin-sidebar-open", isOpen);
+            sidebarToggle?.setAttribute("aria-expanded", String(isOpen));
+        }
+
+        sidebarToggle?.addEventListener("click", () => {
+            setSidebarOpen(!document.body.classList.contains("admin-sidebar-open"));
+        });
+        sidebarOverlay?.addEventListener("click", () => setSidebarOpen(false));
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+    <script src="~/js/admin-theme.js" asp-append-version="true" defer></script>
+    <script src="~/lib/signalr/signalr.min.js" asp-append-version="true" defer></script>
+<script src="~/js/customer-engagement.js" asp-append-version="true" defer></script>
+    @if(isSettings) { <script src="~/js/payment-shipping.js" asp-append-version="true" defer></script> }
+    @if (isOrders || isProducts || isDashboard) { <script src="~/js/admin-excel.js" asp-append-version="true" defer></script> }
+</body>
+</html>

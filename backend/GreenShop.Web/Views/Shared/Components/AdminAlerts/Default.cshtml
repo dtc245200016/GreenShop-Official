@@ -1,0 +1,17 @@
+@model ShopAlertCounts
+@{var kind=(string?)ViewData["Kind"]??"all";}
+@if(kind!="all") {
+    var count=kind=="orders"?Model.Orders:Model.Messages;
+    <span class="shop-alert-badge" data-alert-count="@kind" hidden="@(count==0)" aria-label="@count @(kind=="orders"?"đơn chờ xác nhận":"tin nhắn chưa đọc")">@(count>99?"99+":count.ToString())</span>
+} else {
+    <div class="dropdown admin-alerts" data-admin-alerts data-alerts-url="@Url.Action("ThongBao","KhachHang",new{area="Admin"})">
+        <button class="btn btn-outline-success btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Thông báo cửa hàng"><i class="fa-regular fa-bell" aria-hidden="true"></i><span class="shop-alert-badge" data-alert-count="total" hidden="@(Model.Total==0)">@(Model.Total>99?"99+":Model.Total.ToString())</span></button>
+        <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" asp-area="Admin" asp-controller="KhachHang" asp-action="ThongBaoCuaToi">Thông báo của tôi <span data-alert-count="notifications">@Model.Notifications</span></a></li>
+            <li><a class="dropdown-item" asp-area="Admin" asp-controller="DonHang" asp-action="QuanLyDonHang" asp-route-status="0">Đơn chờ xác nhận <span data-alert-count="orders">@Model.Orders</span></a></li>
+            <li><a class="dropdown-item" asp-area="Admin" asp-controller="KhachHang" asp-action="TinNhan">Tin nhắn chưa đọc <span data-alert-count="messages">@Model.Messages</span></a></li>
+            <li><a class="dropdown-item" asp-area="Admin" asp-controller="KhachHang" asp-action="DanhGia">Đánh giá mới <span data-alert-count="reviews">@Model.Reviews</span></a></li>
+        </ul>
+        <span class="visually-hidden" data-alert-status role="status" aria-live="polite"></span>
+    </div>
+}

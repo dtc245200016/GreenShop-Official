@@ -1,0 +1,17 @@
+@model CategoryItemViewModel
+@{
+    ViewData["Title"] = "Chi tiết danh mục";
+}
+<partial name="_Assets" />
+<section class="category-page category-form-page">
+    <a asp-action="QuanLyDanhMuc" class="category-back"><i class="fa-solid fa-arrow-left me-2" aria-hidden="true"></i>Quản lý danh mục</a>
+    <header class="category-page-heading"><span class="category-eyebrow">CHI TIẾT DANH MỤC</span><h1>@Model.Name</h1></header>
+    <div class="category-panel category-form-panel">
+        <dl class="category-details">
+            <dt>Trạng thái</dt><dd><span class="category-badge @(Model.IsActive ? "active" : "inactive")">@(Model.IsActive ? "Hoạt động" : "Ngừng hoạt động")</span></dd>
+            <dt>Sản phẩm liên kết</dt><dd class="fs-4 fw-semibold">@Model.ProductCount <span class="fs-6 fw-normal text-muted">sản phẩm</span></dd>
+            <dt>Mô tả</dt><dd class="category-description">@(string.IsNullOrEmpty(Model.Description) ? "Chưa có mô tả." : Model.Description)</dd>
+        </dl>
+        <div class="category-form-actions"><a asp-action="SuaDanhMuc" asp-route-id="@Model.Id" class="btn category-primary">Sửa danh mục</a><a asp-action="XoaDanhMuc" asp-route-id="@Model.Id" class="btn category-secondary">Kiểm tra xóa</a></div>
+    </div>
+</section>

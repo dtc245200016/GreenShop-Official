@@ -1,0 +1,6 @@
+@model Order
+@{ var events = Model.History.OrderByDescending(h => h.CreatedAt).ThenByDescending(h => h.Id).ToList(); }
+<section class="order-panel order-history-panel"><div class="order-panel-heading"><h2><i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>Lịch sử thao tác</h2><span>@events.Count sự kiện</span></div>
+    @if (events.Count == 0) { <p class="order-history-empty">Chưa có thay đổi quản trị được ghi nhận. Lịch sử bắt đầu từ khi module này hoạt động.</p> }
+    else { <ol class="order-history">@foreach (var entry in events) { <li data-history-kind="@entry.Kind"><span class="order-history-dot" aria-hidden="true"></span><div><strong>@(entry.Kind switch { OrderHistoryKind.Note => "Cập nhật ghi chú nội bộ", OrderHistoryKind.Payment => Model.PaymentMethod==PaymentMethods.VietQr ? "Xác nhận đã nhận chuyển khoản" : "Xác nhận đã thu COD", OrderHistoryKind.CustomerTransfer => "Khách hàng thông báo chuyển khoản", OrderHistoryKind.Inventory => "Đối chiếu đã trừ kho", _ => $"{OrderWorkflow.Label(entry.FromStatus!.Value)} → {OrderWorkflow.Label(entry.ToStatus!.Value)}" })</strong><small>@entry.CreatedAt.ToString("dd/MM/yyyy HH:mm:ss") UTC · @(entry.Kind==OrderHistoryKind.CustomerTransfer ? "Khách hàng" : entry.AdminName)</small>@if (!string.IsNullOrEmpty(entry.Note)) { <p>@entry.Note</p> }</div></li> }</ol> }
+</section>

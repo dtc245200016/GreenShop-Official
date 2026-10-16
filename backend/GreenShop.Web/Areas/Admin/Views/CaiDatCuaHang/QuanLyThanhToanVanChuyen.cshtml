@@ -1,0 +1,42 @@
+@model PaymentShippingSettingsViewModel
+@using GreenShop.Web.Services
+@{ ViewData["Title"]="Cài đặt thanh toán & vận chuyển"; var preview=VietQrImages.Preview(Model.Settings); }
+<section class="payment-settings">
+<nav class="shop-breadcrumb"><a asp-area="Admin" asp-controller="Admin" asp-action="TongQuan">Tổng quan</a><span>/</span><span>Cài đặt cửa hàng</span></nav>
+<header class="settings-heading"><span class="settings-eyebrow">GREENSHOP · CÀI ĐẶT CỬA HÀNG</span><h1>Thanh toán &amp; vận chuyển</h1><p>Chăm chút bước cuối của mỗi đơn hàng. Thay đổi chỉ áp dụng cho đơn mới.</p></header>
+@if(TempData["SuccessMessage"] is string success) { <div class="alert alert-success" role="status">@success</div> }
+@if(TempData["ErrorMessage"] is string error) { <div class="alert alert-danger" role="alert">@error</div> }
+<div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
+@if(ViewData["Unavailable"] is true) { <div class="alert alert-warning">Chưa thể tải cấu hình. Vui lòng thử lại sau khi kết nối được khôi phục.</div> }
+else {
+<nav class="settings-jump" aria-label="Khu vực cài đặt"><a href="#bank-settings"><i class="fa-solid fa-building-columns" aria-hidden="true"></i>Tài khoản nhận tiền</a><a href="#shipping-settings"><i class="fa-solid fa-truck-fast" aria-hidden="true"></i>Phí vận chuyển</a></nav>
+@if(Model.PendingEarlierBankOrders>0) { <div class="settings-notice" role="status"><strong>@Model.PendingEarlierBankOrders đơn chưa thanh toán đang dùng tài khoản nhận tiền trước đây.</strong><p>Thông tin của các đơn này được giữ nguyên. Hãy đối chiếu cả tài khoản cũ khi khách thông báo chuyển khoản.</p><a asp-area="Admin" asp-controller="DonHang" asp-action="QuanLyDonHang" asp-route-paymentMethod="VIETQR" asp-route-paymentState="unpaid">Xem đơn chuyển khoản chưa thanh toán →</a></div> }
+<div class="settings-layout">
+<section id="bank-settings" class="settings-card"><div class="settings-card-heading"><span class="settings-icon"><i class="fa-solid fa-building-columns" aria-hidden="true"></i></span><div><h2>Tài khoản nhận chuyển khoản</h2><p>VietQR giúp khách điền nhanh thông tin chuyển khoản.</p></div><span class="settings-status">@(Model.Settings.VietQrEnabled ? "Đang bật" : "Đang tắt")</span></div>
+<form asp-action="LuuTaiKhoanNganHang" method="post" class="settings-form" data-settings-submit>
+<input asp-for="Bank.ExpectedVersion" type="hidden" />
+<div class="settings-field"><label for="bankSearch">Tìm ngân hàng</label><input id="bankSearch" type="search" placeholder="Tên hoặc mã ngân hàng…" autocomplete="off" data-bank-search /></div>
+<div class="settings-field"><label asp-for="Bank.BankBin">Ngân hàng nhận tiền</label><select asp-for="Bank.BankBin" required><option value="">Chọn ngân hàng</option>@foreach(var bank in VietQrBanks.All.OrderBy(x=>x.ShortName)) { <option value="@bank.Bin">@bank.ShortName · @bank.Name (@bank.Bin)</option> }</select><span asp-validation-for="Bank.BankBin"></span></div>
+<div class="settings-field"><label asp-for="Bank.AccountNumber">Số tài khoản</label><input asp-for="Bank.AccountNumber" maxlength="19" pattern="[A-Za-z0-9]{1,19}" autocomplete="off" required /><small>Giữ nguyên số 0 đầu. Hỗ trợ tối đa 19 ký tự chữ hoặc số.</small><span asp-validation-for="Bank.AccountNumber"></span></div>
+<div class="settings-field"><label asp-for="Bank.AccountHolderName">Tên chủ tài khoản</label><input asp-for="Bank.AccountHolderName" maxlength="100" autocomplete="off" required /><span asp-validation-for="Bank.AccountHolderName"></span></div>
+<label class="settings-check"><input asp-for="Bank.VietQrEnabled" /><span><strong>Bật chuyển khoản VietQR</strong><small>COD luôn có sẵn. Tài khoản đã lưu sẽ dùng cho đơn VietQR mới.</small></span></label>
+<label class="settings-check"><input asp-for="Bank.BankDetailsChecked" /><span>Tôi đã kiểm tra ngân hàng, số tài khoản và tên người nhận thực tế trước khi bật.</span></label><span asp-validation-for="Bank.BankDetailsChecked" class="text-danger"></span>
+<p class="settings-hint">VietQR không xác minh chủ tài khoản thay cho ngân hàng. Đổi cấu hình không đổi thông tin chuyển khoản của đơn đã đặt.</p>
+<button type="submit" class="btn btn-success"><i class="fa-solid fa-check" aria-hidden="true"></i>Lưu tài khoản ngân hàng</button>
+</form>
+@if(preview!=null) { <details class="settings-preview"><summary>Xem trước mã QR</summary><p>Mã xem trước không gắn đơn hàng và không đặt số tiền. Không dùng để chuyển tiền thử.</p><div class="qr-image-shell" data-qr-shell><span class="qr-image-state" data-qr-loading>Đang tải ảnh VietQR…</span><img src="@preview" alt="Xem trước VietQR của tài khoản đã lưu" referrerpolicy="no-referrer" data-vietqr-image width="540" height="640" /><p data-qr-error hidden>Không tải được ảnh. Kiểm tra thông tin tài khoản đã lưu ở trên.</p></div></details> }
+</section>
+<section id="shipping-settings" class="settings-card"><div class="settings-card-heading"><span class="settings-icon"><i class="fa-solid fa-truck-fast" aria-hidden="true"></i></span><div><h2>Chính sách vận chuyển</h2><p>Một mức phí, áp dụng toàn quốc trong phạm vi cửa hàng.</p></div></div>
+<form asp-action="LuuChinhSachVanChuyen" method="post" class="settings-form" data-settings-submit data-shipping-example>
+<input asp-for="Shipping.ExpectedVersion" type="hidden" />
+<div class="settings-field"><label asp-for="Shipping.FlatShippingFee">Phí vận chuyển cố định (VNĐ)</label><input asp-for="Shipping.FlatShippingFee" type="number" min="0" max="1000000" step="1" required /><span asp-validation-for="Shipping.FlatShippingFee"></span></div>
+<div class="settings-field"><label asp-for="Shipping.FreeShippingThreshold">Tiền hàng để được miễn phí ship (VNĐ)</label><input asp-for="Shipping.FreeShippingThreshold" type="number" min="0" max="1000000000" step="1" required /><small>Tính theo tiền sản phẩm trước phí ship. Ngưỡng 0 nghĩa là miễn phí mọi đơn.</small><span asp-validation-for="Shipping.FreeShippingThreshold"></span></div>
+<div class="settings-example"><label for="shippingExample">Thử tính với tiền hàng (VNĐ)</label><input id="shippingExample" type="number" min="1" max="1000000000" step="1" value="250000" /><dl><dt>Phí ship dự kiến</dt><dd data-example-fee></dd><dt>Tổng dự kiến</dt><dd data-example-total></dd></dl><small>Ví dụ minh họa chính sách đang nhập, không tạo đơn hàng.</small></div>
+<button class="btn btn-success" type="submit"><i class="fa-solid fa-check" aria-hidden="true"></i>Lưu chính sách vận chuyển</button>
+</form>
+<p class="settings-hint">Đơn đã đặt giữ phí ship lúc mua. Khách đang ở checkout sẽ được yêu cầu xác nhận lại nếu chính sách thay đổi.</p>
+@if(Model.Settings.UpdatedAt.HasValue) { <small>Cập nhật @DashboardPeriod.LocalTime(Model.Settings.UpdatedAt.Value) · GMT+7</small> }
+</section>
+</div>
+}
+</section>

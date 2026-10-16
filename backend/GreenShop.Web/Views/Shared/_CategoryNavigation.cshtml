@@ -1,0 +1,5 @@
+@model StoreCatalogViewModel
+<nav class="category-chips" aria-label="Danh mục sản phẩm">
+    <a class="category-chip @(Model.CategoryId == null ? "active" : "")" aria-current="@(Model.CategoryId == null ? "page" : null)" asp-controller="SanPham" asp-action="CuaHang" asp-route-search="@Model.Search" asp-route-sort="@Model.Sort"><i class="fa-solid fa-border-all" aria-hidden="true"></i>Tất cả sản phẩm</a>
+    @foreach (var category in Model.Categories) { <a class="category-chip @(Model.CategoryId == category.Id ? "active" : "")" aria-current="@(Model.CategoryId == category.Id ? "page" : null)" asp-controller="SanPham" asp-action="CuaHang" asp-route-categoryId="@category.Id" asp-route-search="@Model.Search" asp-route-sort="@Model.Sort">@category.Name<span>@category.ProductCount</span></a> }
+</nav>

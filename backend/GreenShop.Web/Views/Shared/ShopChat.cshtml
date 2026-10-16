@@ -1,0 +1,22 @@
+@model ShopChatViewModel
+@{ var admin=User.IsInRole("Admin");if(admin) Layout="~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";ViewData["Title"]=Model.Title; }
+<section class="@(admin?"engagement-heading":"shop-page-heading")"><h1>@Model.Title</h1><p>Trao đổi trực tiếp với @(admin?"khách hàng":"cửa hàng"). Tin nhắn được lưu để bạn tiếp tục cuộc trò chuyện.</p></section>
+@{ var mine=Model.AssignedAdminId==GreenShop.Web.Services.ShoppingIdentity.UserId(User);var canReply=!admin || (Model.Status=="Waiting" && Model.AssignedAdminId==null) || (Model.Status=="InProgress" && mine); }
+@if(admin) {
+    <section class="chat-workflow" aria-label="Trạng thái hỗ trợ">
+        <div><strong data-conversation-state>@(Model.Status=="Waiting"?"Chờ phản hồi":Model.Status=="Resolved"?"Đã giải quyết":"Đang hỗ trợ")</strong><p data-conversation-hint>@(canReply?(Model.Status=="Waiting"?"Gửi phản hồi đầu tiên để tự động tiếp nhận cuộc trò chuyện này.":"Bạn đang phụ trách cuộc trò chuyện này."):Model.Status=="Resolved"?"Cuộc trò chuyện đã kết thúc. Mở lại để tiếp tục hỗ trợ.":$"{Model.AssignedAdminName??"Quản trị viên khác"} đang phụ trách. Bạn có thể xem tin nhắn tại đây.")</p></div>
+        <form asp-action="TiepNhan" asp-route-id="@Model.ConversationId" method="post" data-conversation-action="claim" hidden="@(Model.Status!="Waiting" || Model.AssignedAdminId!=null)" data-engagement-submit><input type="hidden" name="version" data-conversation-version value="@Model.Version" /><button class="btn btn-outline-success" type="submit">Tiếp nhận cuộc trò chuyện</button></form>
+        <form asp-action="KetThuc" asp-route-id="@Model.ConversationId" method="post" data-conversation-action="resolve" hidden="@(Model.Status!="InProgress" || !mine)" data-engagement-submit><input type="hidden" name="version" data-conversation-version value="@Model.Version" /><button class="btn btn-outline-success" type="submit">Đánh dấu đã giải quyết</button></form>
+        <form asp-action="MoLai" asp-route-id="@Model.ConversationId" method="post" data-conversation-action="reopen" hidden="@(Model.Status!="Resolved" || !mine)" data-engagement-submit><input type="hidden" name="version" data-conversation-version value="@Model.Version" /><button class="btn btn-success" type="submit">Mở lại để phản hồi</button></form>
+    </section>
+}
+<section class="shop-chat support-conversation" data-conversation-id="@Model.ConversationId" data-shop-chat data-can-reply="@canReply.ToString().ToLowerInvariant()" data-chat-identity="@(GreenShop.Web.Services.ShoppingIdentity.UserId(User)):@(GreenShop.Web.Services.UserSession.Version(User))" data-messages-url="@Url.Action("TinNhanMoi",new{id=Model.ConversationId})" data-read-url="@Url.Action("DaDoc",new{id=Model.ConversationId})" data-admin="@(admin?"true":"false")">
+    <header class="support-conversation-heading"><span class="support-avatar" aria-hidden="true"><i class="fa-solid fa-comments"></i></span><div><strong>Trò chuyện với @Model.Title</strong><small>Cuộn chuột để xem tin nhắn trước · Enter để gửi</small></div></header>
+    <div class="chat-messages" data-chat-messages tabindex="0" role="log" aria-live="polite" aria-relevant="additions" aria-label="Nội dung trò chuyện"><p class="chat-empty" data-chat-empty>Đang tải cuộc trò chuyện…</p></div>
+    <form asp-action="GuiTinNhan" asp-route-id="@Model.ConversationId" method="post" data-chat-form>
+        <label for="chat-content">Tin nhắn</label><textarea id="chat-content" name="Content" rows="3" maxlength="2000" required placeholder="Nhập tin nhắn của bạn…"></textarea>
+        <input type="hidden" name="RequestToken" value="@Guid.NewGuid().ToString("N")" />
+        <div class="chat-actions"><small>Enter để gửi · Shift + Enter để xuống dòng</small><button class="@(admin?"btn btn-success":"shop-btn primary")" type="submit" disabled="@(!canReply)"><i class="fa-regular fa-paper-plane" aria-hidden="true"></i> Gửi tin nhắn</button></div>
+    </form><p class="chat-feedback" data-chat-feedback role="status" aria-live="polite"></p>
+</section>
+@if(admin) { <a class="btn btn-outline-secondary mt-3" asp-action="TinNhan">Quay lại hộp thư</a> }

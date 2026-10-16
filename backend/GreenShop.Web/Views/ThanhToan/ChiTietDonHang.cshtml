@@ -1,0 +1,15 @@
+@model Order
+@using GreenShop.Web.Services
+@{ ViewData["Title"] = $"Đơn hàng #{Model.Id}"; }
+<section class="shop-page-heading"><span class="shop-eyebrow">GREENSHOP · ĐƠN HÀNG CỦA BẠN</span><h1>Đơn hàng #@Model.Id</h1><p>@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm") UTC · @OrderWorkflow.Label(Model.Status) · @PaymentMethods.Status(Model) · @PaymentMethods.Label(Model.PaymentMethod)</p></section>
+<div class="checkout-layout"><section class="shop-panel order-items"><h2>Sản phẩm đã đặt</h2>@foreach (var item in Model.Items) { <div class="order-item"><img src="@StoreDisplay.Image(item.ImageUrl)" data-product-image alt="@item.ProductName" width="100" height="100" /><div><h3>@item.ProductName</h3><p>@item.Quantity × @OrderWorkflow.Money(item.UnitPrice)</p><strong>@OrderWorkflow.Money(item.UnitPrice * item.Quantity)</strong>
+@if(Model.Status==OrderStatus.Completed && item.ProductId.HasValue) {
+ if(((IReadOnlyList<int>?)ViewData["ReviewedItems"] ?? Array.Empty<int>()).Contains(item.Id)) { <p class="review-complete"><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Đã đánh giá · <a asp-controller="TuongTac" asp-action="DanhGia" asp-route-id="@item.Id">Sửa đánh giá</a></p> }
+ else { <a class="shop-btn secondary" asp-controller="TuongTac" asp-action="DanhGia" asp-route-id="@item.Id">Đánh giá sản phẩm <i class="fa-regular fa-star" aria-hidden="true"></i></a> }
+}</div></div> }<partial name="_OrderMoney" model="Model" />
+@if(Model.PaidAt.HasValue) { <p class="payment-history-hint">Đã xác nhận nhận tiền @DashboardPeriod.LocalTime(Model.PaidAt.Value) · GMT+7</p> }
+</section><aside class="shop-summary"><h2>Giao đến</h2><strong>@Model.RecipientName</strong><p>@Model.Phone</p><p class="receipt-address">@Model.Address</p>
+@if(PaymentMethods.NeedsTransfer(Model)) { <a class="shop-btn primary" asp-action="ThanhToanVietQR" asp-route-id="@Model.Id">Xem mã chuyển khoản <i class="fa-solid fa-qrcode" aria-hidden="true"></i></a> }
+@if(Model.Status==OrderStatus.Cancelled && Model.IsPaid) { <p class="payment-history-hint">Đơn đã hủy nhưng có ghi nhận thanh toán. Cần liên hệ cửa hàng để xử lý hoàn tiền thủ công; chưa có xác nhận hoàn tiền.</p> }
+<button type="button" class="shop-btn secondary chat-entry" data-chat-mode="shop" aria-controls="hybrid-chat"><i class="fa-regular fa-comments" aria-hidden="true"></i>Chat với Shop</button>
+<a class="shop-btn secondary" asp-action="DonHangCuaToi">Đơn hàng của tôi</a><a class="shop-text-link" asp-controller="SanPham" asp-action="CuaHang">Tiếp tục khám phá →</a></aside></div>

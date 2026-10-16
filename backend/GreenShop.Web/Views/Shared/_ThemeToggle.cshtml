@@ -1,0 +1,10 @@
+<button type="button" class="theme-flower" data-theme-toggle aria-label="Chuyển sang giao diện tối" aria-pressed="false" title="Đổi giao diện sáng / tối">
+    <svg viewBox="0 0 80 80" aria-hidden="true" focusable="false">
+        <path class="flower-stem" d="M40 70Q29 57 31 48M32 54Q13 52 17 36Q34 35 32 54" />
+        <g class="flower-bloom">
+            @for (var petal = 0; petal < 8; petal++) { <ellipse class="flower-petal" cx="40" cy="23" rx="9" ry="16" transform="rotate(@(petal * 45) 40 40)" /> }
+            <circle class="flower-center" cx="40" cy="40" r="12" />
+        </g>
+    </svg>
+    <span class="visually-hidden" data-theme-label>Chuyển sang giao diện tối</span>
+</button>

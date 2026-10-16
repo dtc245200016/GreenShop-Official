@@ -1,0 +1,20 @@
+@model AdminUserListViewModel
+@{
+    ViewData["Title"]="Quản lý người dùng";
+    var f=Model.Filter;
+    string PageUrl(int page) => Url.Action("QuanLyNguoiDung",new {search=f.Search,role=f.Role.HasValue?(int?)f.Role.Value:null,active=f.Active,sort=f.Sort,page,pageSize=f.PageSize})!;
+    var stats=new[] {("Tổng tài khoản",Model.Total,"users"),("Khách hàng",Model.Customers,"user"),("Quản trị viên",Model.Administrators,"user-shield"),("Đang hoạt động",Model.Active,"circle-check"),("Đã khóa",Model.Locked,"lock")};
+}
+<section class="order-admin user-admin">
+    <nav class="order-breadcrumb" aria-label="Điều hướng"><a asp-area="Admin" asp-controller="Admin" asp-action="Index">Tổng quan</a><span>/</span><span aria-current="page">Người dùng</span></nav>
+    <header class="order-page-header"><div><span class="order-eyebrow">GREENSHOP · TÀI KHOẢN</span><h1>Quản lý người dùng</h1><p>Thông tin rõ ràng. Đổi quyền và quản lý truy cập an toàn.</p></div><span class="order-context"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i>Chỉ dành cho quản trị viên</span></header>
+    <partial name="~/Areas/Admin/Views/DonHang/_Feedback.cshtml" />
+    <div class="order-stats user-stats">@foreach(var (label,count,icon) in stats) { <article class="order-stat"><span class="order-stat-icon"><i class="fa-solid fa-@icon" aria-hidden="true"></i></span><span>@label</span><strong>@count</strong></article> }</div>
+    <div class="order-panel">
+        <partial name="_BoLocNguoiDung" model="f" />
+        <div class="order-list-heading"><div><h2>Danh sách tài khoản</h2><p>@Model.MatchingCount kết quả</p></div><span>Trang @f.Page / @Model.TotalPages</span></div>
+        @if(Model.Users.Count==0) { <div class="order-empty" role="status"><span><i class="fa-solid fa-users" aria-hidden="true"></i></span><h3>@(Model.Total==0?"Chưa có tài khoản":"Không tìm thấy người dùng")</h3><p>@(Model.Total==0?"Tài khoản sẽ xuất hiện tại đây khi được đăng ký.":"Thử họ tên, email hoặc bộ lọc khác.")</p><a class="order-btn secondary" asp-action="QuanLyNguoiDung">Xóa bộ lọc</a></div> }
+        else { <partial name="_BangNguoiDung" model="Model.Users" /> }
+        <nav class="order-pagination" aria-label="Phân trang người dùng"><span>@(Model.MatchingCount==0 ? 0 : (f.Page-1)*f.PageSize+1)–@Math.Min(f.Page*f.PageSize,Model.MatchingCount) / @Model.MatchingCount tài khoản</span><div>@if(f.Page>1) { <a class="order-btn secondary" href="@PageUrl(f.Page-1)">Trang trước</a> }<span aria-current="page">@f.Page</span>@if(f.Page<Model.TotalPages) { <a class="order-btn secondary" href="@PageUrl(f.Page+1)">Trang tiếp</a> }</div></nav>
+    </div>
+</section>

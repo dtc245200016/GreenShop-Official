@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f8fbf6" />
+    <script>try{const p=localStorage.getItem('greenshop.theme');document.documentElement.dataset.theme=p==='light'||p==='dark'?p:matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}catch{document.documentElement.dataset.theme=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}</script>
+    <title>@ViewData["Title"] · GreenShop</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/fontawesome/css/all.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/storefront.css" asp-append-version="true" />
+    <link rel="preload" href="~/fonts/be-vietnam-pro/be-vietnam-pro-400-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="~/fonts/be-vietnam-pro/be-vietnam-pro-400-vietnamese.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="~/css/admin-fonts.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/storefront-theme.css" asp-append-version="true" />
+</head>
+<body class="storefront auth-page">
+<header class="shop-container auth-header"><a class="shop-brand" asp-controller="Home" asp-action="Index"><i class="fa-solid fa-leaf" aria-hidden="true"></i><span>GreenShop<small>SỐNG XANH MỖI NGÀY</small></span></a><div class="auth-header-actions"><a asp-controller="SanPham" asp-action="CuaHang">Về cửa hàng <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a><partial name="_ThemeToggle" /></div></header>
+<main role="main" class="auth-main">@RenderBody()</main>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
+<script src="~/js/storefront.js" asp-append-version="true" defer></script>
+<script src="~/js/storefront-theme.js" asp-append-version="true" defer></script>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

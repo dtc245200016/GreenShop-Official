@@ -1,0 +1,11 @@
+@model int
+@{
+    ViewData["Title"] = Model == 404 ? "Không tìm thấy nội dung" : "Yêu cầu chưa hợp lệ";
+}
+<section class="shop-empty" role="status">
+    <span class="shop-eyebrow">GREENSHOP · @Model</span>
+    <i class="fa-solid fa-seedling" aria-hidden="true"></i>
+    <h1>@ViewData["Title"]</h1>
+    <p>@(Model == 404 ? "Sản phẩm hoặc danh mục không còn tồn tại, hoặc đã ngừng bán. Hãy khám phá những lựa chọn khác trong cửa hàng." : "Vui lòng quay lại trang sản phẩm và thử lại với thông tin hợp lệ.")</p>
+    <a class="shop-btn primary" asp-controller="SanPham" asp-action="CuaHang">Về cửa hàng</a>
+</section>

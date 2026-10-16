@@ -1,0 +1,48 @@
+@model ProductFormViewModel
+
+<div asp-validation-summary="All" class="text-danger mb-3" role="alert"></div>
+<div class="mb-3">
+    <label asp-for="Name" class="form-label fw-semibold"></label>
+    <input asp-for="Name" class="form-control" maxlength="150" required />
+    <span asp-validation-for="Name" class="text-danger small"></span>
+</div>
+<div class="mb-3">
+    <label asp-for="CategoryId" class="form-label fw-semibold"></label>
+    <select asp-for="CategoryId" asp-items="Model.Categories" class="form-select">
+        <option value="">Chưa phân loại</option>
+    </select>
+    <span asp-validation-for="CategoryId" class="text-danger small"></span>
+    <div class="form-text">Chọn danh mục đang hoạt động hoặc giữ danh mục hiện tại.</div>
+</div>
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <label asp-for="Price" class="form-label fw-semibold"></label>
+        <input asp-for="Price" type="number" class="form-control" min="0.01" max="9999999999.99" step="0.01" required />
+        <span asp-validation-for="Price" class="text-danger small"></span>
+    </div>
+    <div class="col-md-6 mb-3">
+        <label asp-for="StockQuantity" class="form-label fw-semibold"></label>
+        <input asp-for="StockQuantity" type="number" class="form-control" min="0" max="2147483647" step="1" required />
+        <span asp-validation-for="StockQuantity" class="text-danger small"></span>
+    </div>
+</div>
+<div class="mb-3">
+    <label asp-for="Description" class="form-label fw-semibold"></label>
+    <textarea asp-for="Description" class="form-control" rows="5" maxlength="2000"></textarea>
+    <span asp-validation-for="Description" class="text-danger small"></span>
+</div>
+@if (!string.IsNullOrEmpty(Model.ExistingImageUrl))
+{
+    <div class="mb-3">
+        <p class="form-label fw-semibold">Ảnh hiện tại</p>
+        <img src="@Model.ExistingImageUrl" alt="Ảnh sản phẩm hiện tại" class="img-thumbnail"
+             style="max-height: 200px; max-width: 100%;" />
+        <p class="small text-muted mt-2">Không chọn ảnh mới nếu muốn giữ ảnh hiện tại.</p>
+    </div>
+}
+<div class="mb-4">
+    <label asp-for="Image" class="form-label fw-semibold"></label>
+    <input asp-for="Image" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp" />
+    <div class="form-text">JPG, JPEG, PNG hoặc WebP; tối đa 5 MiB. Bắt buộc khi thêm sản phẩm.</div>
+    <span asp-validation-for="Image" class="text-danger small"></span>
+</div>

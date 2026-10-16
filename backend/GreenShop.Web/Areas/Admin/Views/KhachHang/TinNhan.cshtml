@@ -1,0 +1,8 @@
+@model ShopInboxViewModel
+@{ViewData["Title"]="Tin nhắn khách hàng";}
+<section class="engagement-heading"><h1>Tin nhắn khách hàng</h1><p>Mở cuộc trò chuyện để đọc và phản hồi khách hàng.</p></section>
+<section class="engagement-panel">
+@if(Model.Conversations.Count==0) {<p>Chưa có cuộc trò chuyện.</p>}
+@foreach(var conversation in Model.Conversations) { <a class="inbox-row" asp-action="TroChuyen" asp-route-id="@conversation.Id"><span><strong>@conversation.Customer.FullName</strong><small>@conversation.Status · @(conversation.AssignedAdminId?.ToString()??"Chưa tiếp nhận") · @DashboardPeriod.LocalTime(conversation.UpdatedAt)</small></span>@if(Model.Unread.GetValueOrDefault(conversation.Id)>0) {<span class="shop-alert-badge">@Model.Unread[conversation.Id]</span>}<i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a> }
+<nav class="engagement-pagination" aria-label="Phân trang tin nhắn">@if(Model.Page>1){<a class="btn btn-outline-secondary" asp-route-page="@(Model.Page-1)">Trang trước</a>}<span>Trang @Model.Page</span>@if(Model.HasNext){<a class="btn btn-outline-secondary" asp-route-page="@(Model.Page+1)">Trang sau</a>}</nav>
+</section>

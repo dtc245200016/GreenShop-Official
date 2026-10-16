@@ -1,0 +1,34 @@
+@model AdminOrderDetailViewModel
+@{
+    var order=Model.Order;
+    var next=OrderWorkflow.Next(order.Status);
+    var canWork=order.InventoryStatus==OrderInventoryStatus.Deducted && Model.ValidTotal;
+    var blockedByPayment=order.PaymentMethod==PaymentMethods.VietQr && !order.IsPaid && next is OrderStatus.Shipping or OrderStatus.Completed;
+}
+<section class="order-panel order-action-panel no-print">
+    <div class="order-action-intro"><h2>Việc cần làm</h2><p>Chọn bước tiếp theo phù hợp với tình trạng giao nhận thực tế.</p></div>
+    @if(order.InventoryStatus==OrderInventoryStatus.Unverified && OrderWorkflow.CanCancel(order.Status)) {
+        <div class="order-legacy-check"><div><h3>Đối chiếu tồn kho của đơn cũ</h3><p>Đơn này được tạo trước khi hệ thống có dấu ghi nhận trừ kho. Hãy kiểm tra xem số lượng khách mua đã được trừ khỏi kho chưa.</p><p><strong>Nút dưới chỉ lưu kết quả kiểm tra, không trừ thêm hàng.</strong> Sau khi ghi nhận, bạn có thể xử lý đơn hoặc hủy để hoàn lại số lượng đã trừ. Đơn mới sẽ tự ghi nhận khi đặt hàng.</p></div>
+        @if(Model.ValidTotal) { <form asp-action="XacNhanDaTruKho" asp-route-id="@order.Id" method="post" data-order-submit data-order-confirm data-confirm-title="Ghi nhận kết quả kiểm tra kho" data-confirm-label="Ghi nhận đơn đã trừ kho" data-confirm-description="Bạn đã kiểm tra và chắc chắn số lượng trong đơn này đã được trừ khỏi tồn kho khi đặt hàng? Thao tác này chỉ lưu kết quả đối chiếu, không thay đổi số lượng kho. Chưa có căn cứ thì chọn Hủy bỏ." data-confirm-reason="Bạn đã kiểm tra bằng căn cứ nào?"><input type="hidden" name="ExpectedVersion" value="@order.Version" /><input type="hidden" name="Note" data-confirm-note /><button type="submit" class="order-btn secondary">Ghi nhận đơn đã trừ kho<i class="fa-solid fa-clipboard-check" aria-hidden="true"></i></button></form> }
+        </div>
+    }
+    <div class="order-action-buttons">
+    @if(next.HasValue && canWork && !blockedByPayment) {
+        <form asp-action="@(order.Status==OrderStatus.Pending?"XacNhanDonHang":"CapNhatTrangThaiDonHang")" asp-route-id="@order.Id" method="post" data-order-submit data-order-confirm data-confirm-title="@OrderWorkflow.ActionLabel(next.Value)" data-confirm-label="@OrderWorkflow.ActionLabel(next.Value)" data-confirm-description="Chuyển đơn @OrderWorkflow.Code(order.Id) sang @OrderWorkflow.Label(next.Value). Số lượng kho được giữ nguyên. Thanh toán được ghi nhận riêng."><input type="hidden" name="ExpectedVersion" value="@order.Version" /><input type="hidden" name="TargetStatus" value="@((int)next.Value)" /><button type="submit" class="order-btn primary">@OrderWorkflow.ActionLabel(next.Value)<i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button></form>
+    }
+    @if(order.Status==OrderStatus.Completed && !order.IsPaid && string.Equals(order.PaymentMethod,"COD",StringComparison.OrdinalIgnoreCase) && Model.ValidTotal) {
+        <form asp-action="XacNhanThuCod" asp-route-id="@order.Id" method="post" data-order-submit data-order-confirm data-confirm-title="Ghi nhận đã nhận tiền COD" data-confirm-label="Ghi nhận đã nhận tiền" data-confirm-description="Bạn đã nhận đủ tiền COD của đơn @OrderWorkflow.Code(order.Id)? Chỉ ghi nhận khi có chứng từ hoặc căn cứ đối chiếu. Giao thành công chưa đồng nghĩa đã thu được tiền." data-confirm-reason="Căn cứ xác nhận đã nhận tiền"><input name="ExpectedVersion" type="hidden" value="@order.Version" /><input name="Note" type="hidden" data-confirm-note /><button type="submit" class="order-btn primary">Ghi nhận đã nhận tiền COD<i class="fa-solid fa-check" aria-hidden="true"></i></button></form>
+    }
+    @if(PaymentMethods.NeedsTransfer(order) && Model.ValidTotal) {
+        <form asp-action="XacNhanDaNhanTien" asp-route-id="@order.Id" method="post" data-order-submit data-order-confirm data-confirm-title="Xác nhận đã nhận chuyển khoản?" data-confirm-label="Xác nhận đã nhận tiền" data-confirm-description="Chỉ xác nhận khi bạn đã kiểm tra giao dịch trong tài khoản ngân hàng. Đơn @OrderWorkflow.Code(order.Id) · Số tiền @OrderWorkflow.Money(order.Total) · Ngân hàng @order.BankNameSnapshot · Tài khoản @order.BankAccountSnapshot · Nội dung @order.TransferContent. Thao tác này không đổi trạng thái giao hàng hay tồn kho." data-confirm-reason="Căn cứ đối chiếu hoặc mã giao dịch"><input type="hidden" name="ExpectedVersion" value="@order.Version" /><input type="hidden" name="Note" data-confirm-note /><button class="order-btn primary" type="submit">Xác nhận đã nhận tiền<i class="fa-solid fa-check" aria-hidden="true"></i></button></form>
+    }
+    @if(OrderWorkflow.CanCancel(order.Status) && canWork && !order.IsPaid) {
+        <form asp-action="HuyDonHang" asp-route-id="@order.Id" method="post" data-order-submit data-order-confirm data-confirm-title="Hủy đơn hàng" data-confirm-label="Hủy đơn và hoàn kho" data-confirm-description="Hủy đơn @OrderWorkflow.Code(order.Id) và hoàn lại đúng số lượng đã trừ. Đơn hàng vẫn được giữ trong lịch sử. Thao tác này không thể đổi lại trạng thái ban đầu." data-confirm-reason="Lý do hủy đơn" data-confirm-danger><input name="ExpectedVersion" type="hidden" value="@order.Version" /><input name="Note" type="hidden" data-confirm-note /><button type="submit" class="order-btn danger">Hủy đơn hàng<i class="fa-solid fa-ban" aria-hidden="true"></i></button></form>
+    }
+    </div>
+    @if(blockedByPayment) { <p class="order-bank-warning">Đơn VietQR chưa xác nhận nhận tiền. Cần đối chiếu giao dịch trước khi bắt đầu giao hàng.</p> }
+    @if(order.Status==OrderStatus.Cancelled) { <p class="order-helper">Đơn đã hủy. Bạn vẫn có thể xem lịch sử, ghi chú và in thông tin đơn.</p> }
+    @if(order.Status==OrderStatus.Completed) { <p class="order-helper">Đã hoàn tất giao hàng. @(order.IsPaid?"Thanh toán đã được ghi nhận.":"Chỉ ghi nhận thanh toán sau khi đã đối chiếu nhận đủ tiền.")</p> }
+    @if(order.Status==OrderStatus.Shipping) { <p class="order-helper">Chỉ xác nhận đã giao khi người nhận đã nhận hàng. Đơn đang giao chưa thể hủy bằng thao tác thông thường.</p> }
+    @if(order.IsPaid && OrderWorkflow.CanCancel(order.Status)) { <p class="order-helper">Đơn đã thanh toán. Cần đối chiếu việc hoàn tiền trước khi hủy.</p> }
+</section>

@@ -1,0 +1,5 @@
+SERVICE	STATE	HEALTH
+db	running	healthy
+phpmyadmin	running	healthy
+web_app	running	healthy
+nginx	running	healthy

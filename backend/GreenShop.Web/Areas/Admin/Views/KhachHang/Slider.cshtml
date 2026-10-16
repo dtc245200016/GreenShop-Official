@@ -1,0 +1,12 @@
+@model HomeSliderSettings
+@{ViewData["Title"]="Slider trang chủ";}
+<section class="engagement-heading"><h1>Slider trang chủ</h1><p>Ảnh, tên, giá và nút mua cùng chuyển sang sản phẩm tiếp theo sau mỗi 5 giây.</p></section>
+@if(TempData["SuccessMessage"] is string message) { <div class="alert alert-success" role="status">@message</div> }
+<form asp-action="Slider" method="post" class="engagement-panel" data-submit-once data-engagement-submit>
+    <div asp-validation-summary="All" class="text-danger" role="alert"></div><input asp-for="Version" type="hidden" />
+    <label asp-for="Mode">Sản phẩm trình chiếu</label><select asp-for="Mode" class="form-select"><option value="bestsellers">Sản phẩm bán chạy</option><option value="all">Toàn bộ sản phẩm đang hiển thị ở cửa hàng</option></select>
+    <label asp-for="ProductCount">Số sản phẩm bán chạy</label><input asp-for="ProductCount" class="form-control" min="1" max="100" /><span asp-validation-for="ProductCount" class="text-danger"></span>
+    <label asp-for="Days">Khoảng thời gian thống kê (ngày)</label><input asp-for="Days" class="form-control" min="0" max="3650" /><span asp-validation-for="Days" class="text-danger"></span>
+    <p class="text-muted">Nhập 0 để tính toàn bộ thời gian. Xếp theo số lượng trong các đơn đặt ở khoảng thời gian đã chọn và đã giao thành công; không tính đơn hủy hoặc chưa giao. Khi bằng nhau, ưu tiên sản phẩm mới. Hai ô này chỉ áp dụng cho chế độ bán chạy.</p>
+    <button class="btn btn-success" type="submit">Lưu cấu hình</button>
+</form>

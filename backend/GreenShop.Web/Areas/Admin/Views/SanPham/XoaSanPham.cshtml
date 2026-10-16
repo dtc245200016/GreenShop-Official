@@ -1,0 +1,20 @@
+@model Product
+@{
+    ViewData["Title"] = "Xóa sản phẩm";
+    var currency = System.Globalization.CultureInfo.GetCultureInfo("vi-VN");
+}
+
+<h2 class="fw-bold mb-4">Xác nhận xóa sản phẩm</h2>
+<div class="card border-0 shadow-sm rounded-3">
+    <div class="card-body p-4">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+        <div class="alert alert-warning">Bạn có chắc muốn xóa sản phẩm này? Thao tác này không thể hoàn tác.</div>
+        <img src="@Model.ImageUrl" alt="@Model.Name" class="img-thumbnail mb-3" style="max-height: 180px;" />
+        <h3 class="h5">@Model.Name</h3>
+        <p>@Model.Price.ToString("N2", currency) VNĐ — Tồn kho: @Model.StockQuantity</p>
+        <form asp-action="XoaSanPham" asp-route-id="@Model.Id" method="post">
+            <button type="submit" class="btn btn-danger"><i class="fa-solid fa-trash me-1"></i>Xác nhận xóa</button>
+            <a asp-action="QuanLySanPham" class="btn btn-outline-secondary ms-2">Hủy</a>
+        </form>
+    </div>
+</div>

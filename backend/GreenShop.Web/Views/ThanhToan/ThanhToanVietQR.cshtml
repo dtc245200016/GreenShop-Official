@@ -1,0 +1,31 @@
+@model Order
+@using GreenShop.Web.Services
+@using System.Globalization
+@{ ViewData["Title"]="Thanh toán qua VietQR";var qr=VietQrImages.ForOrder(Model);var needsTransfer=PaymentMethods.NeedsTransfer(Model); }
+<nav class="shop-breadcrumb" aria-label="Điều hướng"><a asp-action="DonHangCuaToi">Đơn hàng của tôi</a><span>/</span><a asp-action="ChiTietDonHang" asp-route-id="@Model.Id">@OrderWorkflow.Code(Model.Id)</a><span>/</span><span aria-current="page">VietQR</span></nav>
+<section class="shop-page-heading"><span class="shop-eyebrow">GREENSHOP · THANH TOÁN CHUYỂN KHOẢN</span><h1>Thanh toán qua VietQR</h1><p>@(needsTransfer ? "Quét mã bằng ứng dụng ngân hàng để thanh toán đơn hàng." : "Thông tin thanh toán và trạng thái của đơn hàng.")</p></section>
+<div class="vietqr-layout" data-vietqr-payment>
+<section class="shop-panel vietqr-primary">
+@if(Model.Status==OrderStatus.Cancelled) {
+<div class="payment-result"><span class="payment-result-icon"><i class="fa-solid fa-ban" aria-hidden="true"></i></span><h2>Đơn hàng đã hủy</h2><p>Đơn này không còn yêu cầu chuyển khoản. @(Model.IsPaid ? "Đã ghi nhận thanh toán; cần liên hệ cửa hàng để đối soát và xử lý hoàn tiền thủ công. Chưa có xác nhận hoàn tiền." : "Nếu bạn đã chuyển tiền, hãy liên hệ cửa hàng để đối soát.")</p></div>
+} else if(Model.IsPaid) {
+<div class="payment-result"><span class="payment-result-icon success"><i class="fa-solid fa-check" aria-hidden="true"></i></span><h2>Đã thanh toán</h2><p>GreenShop đã xác nhận nhận tiền của đơn @OrderWorkflow.Code(Model.Id). Bạn không cần chuyển khoản thêm.</p>@if(Model.PaidAt.HasValue) { <small>Xác nhận @DashboardPeriod.LocalTime(Model.PaidAt.Value) · GMT+7</small> }<a class="shop-btn secondary" asp-action="ChiTietDonHang" asp-route-id="@Model.Id">Theo dõi đơn hàng</a></div>
+} else {
+<div class="vietqr-card-heading"><span class="vietqr-brand"><i class="fa-solid fa-leaf" aria-hidden="true"></i>GreenShop</span><span class="payment-badge">Chuyển khoản ngân hàng</span></div>
+@if(Model.CustomerTransferNotifiedAt.HasValue) { <div class="payment-verification" role="status"><i class="fa-regular fa-clock" aria-hidden="true"></i><div><strong>Đang chờ xác nhận chuyển khoản</strong><p>Đã ghi nhận thông báo lúc @DashboardPeriod.LocalTime(Model.CustomerTransferNotifiedAt.Value) · GMT+7. GreenShop đang kiểm tra giao dịch; chưa xác nhận đã nhận tiền. Nếu đã chuyển đủ tiền, bạn không cần chuyển thêm.</p></div></div> }
+@if(qr!=null) { <div class="qr-image-shell" data-qr-shell><span class="qr-image-state" data-qr-loading>Đang tải mã VietQR…</span><img src="@qr" alt="Mã VietQR cho đơn @OrderWorkflow.Code(Model.Id)" data-vietqr-image width="540" height="640" referrerpolicy="no-referrer" /><p data-qr-error hidden>Không tải được ảnh VietQR. Bạn vẫn có thể chuyển khoản thủ công theo thông tin bên dưới.</p></div> }
+else { <div class="payment-verification">Chưa thể hiển thị ảnh QR hợp lệ. Dùng thông tin chuyển khoản của đơn bên dưới và liên hệ cửa hàng nếu thông tin chưa đầy đủ.</div> }
+<div class="vietqr-amount"><span>Số tiền cần chuyển</span><strong>@OrderWorkflow.Money(Model.Total)</strong><button type="button" class="payment-copy" data-copy-value="@Model.Total.ToString("0.##",CultureInfo.InvariantCulture)" aria-label="Sao chép số tiền"><i class="fa-regular fa-copy" aria-hidden="true"></i>Sao chép</button></div>
+<dl class="bank-details"><div><dt>Ngân hàng nhận tiền</dt><dd>@Model.BankNameSnapshot</dd></div><div><dt>Số tài khoản</dt><dd><strong>@Model.BankAccountSnapshot</strong><button type="button" class="payment-copy" data-copy-value="@Model.BankAccountSnapshot" aria-label="Sao chép số tài khoản"><i class="fa-regular fa-copy" aria-hidden="true"></i>Sao chép</button></dd></div><div><dt>Tên chủ tài khoản</dt><dd>@Model.BankHolderSnapshot</dd></div><div class="transfer-content"><dt>Nội dung chuyển khoản</dt><dd><strong>@Model.TransferContent</strong><button type="button" class="payment-copy" data-copy-value="@Model.TransferContent" aria-label="Sao chép nội dung chuyển khoản"><i class="fa-regular fa-copy" aria-hidden="true"></i>Sao chép</button></dd></div></dl>
+<p class="payment-copy-feedback" role="status" aria-live="polite"></p>
+<div class="vietqr-instructions"><h2>Chuyển khoản trong 5 bước</h2><ol><li>Mở ứng dụng ngân hàng.</li><li>Chọn quét mã QR.</li><li>Kiểm tra người nhận, số tiền và nội dung.</li><li>Xác nhận chuyển khoản trong ứng dụng ngân hàng.</li><li>Quay lại GreenShop và thông báo đã chuyển khoản.</li></ol><p>Vui lòng kiểm tra kỹ người nhận trước khi chuyển. Đơn sẽ được xác nhận sau khi cửa hàng đối chiếu giao dịch.</p></div>
+@if(!Model.CustomerTransferNotifiedAt.HasValue) { <form asp-action="ThongBaoDaChuyenKhoan" asp-route-id="@Model.Id" method="post" data-submit-once><input type="hidden" name="ExpectedVersion" value="@Model.Version" /><button type="submit" class="shop-btn primary payment-notify"><i class="fa-solid fa-check" aria-hidden="true"></i>Tôi đã chuyển khoản</button><small>Nút này chỉ gửi thông báo, không tự xác nhận đã thanh toán.</small></form> }
+}
+</section>
+<aside class="shop-summary vietqr-summary"><span class="shop-eyebrow">ĐƠN HÀNG CỦA BẠN</span><h2>@OrderWorkflow.Code(Model.Id)</h2><p class="payment-badge">@PaymentMethods.Status(Model)</p><p>Giao nhận: @OrderWorkflow.Label(Model.Status)</p>
+@foreach(var item in Model.Items) { <div class="checkout-mini-item"><img src="@StoreDisplay.Image(item.ImageUrl)" data-product-image alt="@item.ProductName" width="68" height="68" /><div><h3>@item.ProductName</h3><p>@item.Quantity × @OrderWorkflow.Money(item.UnitPrice)</p></div></div> }
+<partial name="_OrderMoney" model="Model" />
+<div class="vietqr-delivery"><h3>Thông tin giao hàng</h3><strong>@Model.RecipientName</strong><p>@Model.Phone</p><p class="receipt-address">@Model.Address</p></div>
+<a class="shop-btn secondary" asp-action="DonHangCuaToi">Đơn hàng của tôi</a>
+<a class="shop-text-link" asp-action="ThanhToanVietQR" asp-route-id="@Model.Id">Làm mới trạng thái →</a>
+</aside></div>

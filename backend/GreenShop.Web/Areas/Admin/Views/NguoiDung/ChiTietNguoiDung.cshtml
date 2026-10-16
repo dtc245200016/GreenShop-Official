@@ -1,0 +1,20 @@
+@model AdminUserDetailViewModel
+@{
+    var a=Model.Account;
+    ViewData["Title"]="Chi tiết người dùng";
+    var profile=Model.SubmittedProfile;
+}
+<section class="order-admin user-admin" data-user-id="@a.Id" data-user-version="@a.Version">
+    <nav class="order-breadcrumb" aria-label="Điều hướng"><a asp-area="Admin" asp-controller="Admin" asp-action="Index">Tổng quan</a><span>/</span><a asp-action="QuanLyNguoiDung">Người dùng</a><span>/</span><span aria-current="page">Chi tiết tài khoản</span></nav>
+    <header class="order-page-header"><div><span class="order-eyebrow">GREENSHOP · HỒ SƠ TÀI KHOẢN</span><h1>@a.FullName</h1><p>Mã tài khoản #@a.Id · Tạo ngày @a.CreatedAt.ToString("dd/MM/yyyy HH:mm") UTC</p></div><a asp-action="QuanLyNguoiDung" class="order-btn secondary">← Quay lại danh sách</a></header>
+    <partial name="~/Areas/Admin/Views/DonHang/_Feedback.cshtml" />
+    <div class="user-detail-grid">
+        <div class="user-main">
+            <section class="order-panel user-profile"><div class="order-panel-heading"><h2>Thông tin tài khoản</h2><span>Cập nhật họ tên và liên hệ</span></div><form asp-action="CapNhatThongTinNguoiDung" asp-route-id="@a.Id" method="post" data-order-submit><input name="ExpectedVersion" type="hidden" value="@a.Version" /><div class="user-field"><label for="FullName">Họ và tên</label><input id="FullName" name="FullName" value="@(profile?.FullName??a.FullName)" maxlength="100" required readonly="@(!Model.CanEditProfile)" autocomplete="name" aria-describedby="nameError" /><span id="nameError" class="user-field-error">@Html.ValidationMessage("FullName")</span></div><div class="user-field"><label for="Phone">Số điện thoại</label><input id="Phone" name="Phone" type="tel" value="@(profile==null?a.Phone:profile.Phone)" maxlength="21" readonly="@(!Model.CanEditProfile)" autocomplete="tel" aria-describedby="phoneError" /><span id="phoneError" class="user-field-error">@Html.ValidationMessage("Phone")</span></div><div class="user-field"><label for="userEmail">Email đăng nhập</label><input id="userEmail" value="@a.Email" readonly /><p>Email được giữ nguyên để bảo vệ thông tin đăng nhập.</p></div><div class="user-form-footer"><span>Chỉ cập nhật thông tin hồ sơ.</span><button class="order-btn primary" type="submit" disabled="@(!Model.CanEditProfile)">Lưu thay đổi</button></div></form></section>
+            <section class="order-panel order-info-panel"><h2>Hoạt động mua sắm</h2><p class="user-order-count">@a.OrderCount <span>đơn hàng</span></p><p class="order-helper">Đơn hàng và giỏ hàng vẫn được giữ khi tài khoản bị khóa hoặc đổi quyền.</p>@if(a.OrderCount>0) { <a class="order-btn secondary user-orders-link" asp-area="Admin" asp-controller="DonHang" asp-action="QuanLyDonHang" asp-route-customerId="@a.Id">Xem đơn của người dùng</a> }</section>
+        </div>
+        <aside class="user-aside"><partial name="_QuyenVaTrangThai" model="Model" /></aside>
+    </div>
+</section>
+<partial name="~/Areas/Admin/Views/DonHang/_XacNhanThaoTac.cshtml" />
+@section Scripts { <script src="~/js/admin-orders.js" asp-append-version="true" defer></script> }

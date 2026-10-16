@@ -1,0 +1,16 @@
+@model StoreCatalogViewModel
+@{ ViewData["Title"] = Model.CategoryName ?? "Cửa hàng"; }
+<nav class="shop-breadcrumb" aria-label="Breadcrumb"><a asp-controller="Home" asp-action="Index">Trang chủ</a><span aria-hidden="true">/</span><span aria-current="page">Cửa hàng</span></nav>
+<section class="shop-page-heading catalog-page-heading"><div><span class="shop-eyebrow">GREENSHOP · BỘ SƯU TẬP XANH</span><h1>@(Model.CategoryName ?? "Tìm điều xanh bạn yêu")</h1><p>Những lựa chọn nhỏ cho không gian sống của riêng bạn.</p></div><span class="catalog-total"><strong>@Model.TotalCount</strong> sản phẩm</span></section>
+<partial name="_CategoryNavigation" model="Model" />
+<form asp-controller="SanPham" asp-action="CuaHang" method="get" class="shop-search-toolbar"><input type="hidden" name="categoryId" value="@Model.CategoryId" /><div class="shop-search"><label class="visually-hidden" for="product-search">Tìm theo tên sản phẩm</label><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input id="product-search" name="search" value="@Model.Search" maxlength="150" placeholder="Tìm theo tên sản phẩm…" /><button class="shop-btn primary" type="submit">Tìm kiếm</button></div><label class="shop-sort" for="sort"><span>Sắp xếp</span><select name="sort" id="sort" data-sort-submit><option value="newest" selected="@(Model.Sort == "newest")">Mới nhất</option><option value="price-asc" selected="@(Model.Sort == "price-asc")">Giá tăng dần</option><option value="price-desc" selected="@(Model.Sort == "price-desc")">Giá giảm dần</option></select></label></form>
+<div class="catalog-summary"><p><strong>@Model.TotalCount</strong> sản phẩm @(string.IsNullOrEmpty(Model.Search) ? "" : $"cho “{Model.Search}”")</p>@if (!string.IsNullOrEmpty(Model.Search)) { <a asp-action="CuaHang" asp-route-categoryId="@Model.CategoryId" asp-route-sort="@Model.Sort"><i class="fa-solid fa-xmark" aria-hidden="true"></i> Xóa tìm kiếm</a> }<span class="catalog-page-count">Trang @Model.Page / @Model.TotalPages</span></div>
+<partial name="_ProductGrid" model="Model" />
+@if (Model.TotalPages > 1)
+{
+    <nav class="shop-pagination" aria-label="Phân trang sản phẩm">
+        @if (Model.Page > 1) { <a asp-action="CuaHang" asp-route-categoryId="@Model.CategoryId" asp-route-search="@Model.Search" asp-route-sort="@Model.Sort" asp-route-page="@(Model.Page - 1)">← Trước</a> }
+        <span>Trang @Model.Page / @Model.TotalPages</span>
+        @if (Model.Page < Model.TotalPages) { <a asp-action="CuaHang" asp-route-categoryId="@Model.CategoryId" asp-route-search="@Model.Search" asp-route-sort="@Model.Sort" asp-route-page="@(Model.Page + 1)">Tiếp →</a> }
+    </nav>
+}

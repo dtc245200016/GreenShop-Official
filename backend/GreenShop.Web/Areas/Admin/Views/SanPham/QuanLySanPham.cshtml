@@ -1,0 +1,56 @@
+@model IReadOnlyList<Product>
+@{
+    ViewData["Title"] = "Quản lý sản phẩm";
+    var currency = System.Globalization.CultureInfo.GetCultureInfo("vi-VN");
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <h2 class="fw-bold mb-0">Quản lý sản phẩm</h2>
+    <div class="excel-toolbar"><a asp-action="XuatExcelSanPham" class="btn btn-outline-success excel-export" data-excel-export><i class="fa-solid fa-file-excel" aria-hidden="true"></i><span>Xuất Excel</span></a><a asp-action="ThemSanPham" class="btn btn-success"><i class="fa-solid fa-plus me-1"></i>Thêm sản phẩm</a></div>
+</div>
+<p class="excel-hint">Xuất danh sách sản phẩm và tồn kho hiện tại.</p>
+<div class="excel-feedback" role="status" aria-live="polite" hidden></div>
+@if (TempData["SuccessMessage"] is string success)
+{
+    <div class="alert alert-success" role="status">@success</div>
+}
+@if (TempData["WarningMessage"] is string warning)
+{
+    <div class="alert alert-warning" role="alert">@warning</div>
+}
+<div class="card border-0 shadow-sm rounded-3">
+    <div class="card-body">
+        @if (Model.Count == 0)
+        {
+            <p class="text-muted text-center py-4 mb-0">Chưa có sản phẩm. Chọn “Thêm sản phẩm” để bắt đầu.</p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead><tr><th>Ảnh</th><th>Tên sản phẩm</th><th>Danh mục</th><th>Giá bán</th><th>Tồn kho</th><th>Thao tác</th></tr></thead>
+                    <tbody>
+                    @foreach (var product in Model)
+                    {
+                        <tr>
+                            <td><img src="@product.ImageUrl" alt="@product.Name" class="rounded"
+                                     width="72" height="72" style="object-fit: cover;" /></td>
+                            <td class="fw-semibold">@product.Name</td>
+                            <td>@(product.Category?.Name ?? "Chưa phân loại")</td>
+                            <td class="text-nowrap">@product.Price.ToString("N2", currency) VNĐ</td>
+                            <td>@product.StockQuantity</td>
+                            <td>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <a asp-action="ChiTietSanPham" asp-route-id="@product.Id" class="btn btn-outline-success btn-sm">Chi tiết</a>
+                                    <a asp-action="SuaSanPham" asp-route-id="@product.Id" class="btn btn-outline-primary btn-sm">Sửa</a>
+                                    <a asp-action="XoaSanPham" asp-route-id="@product.Id" class="btn btn-outline-danger btn-sm">Xóa</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

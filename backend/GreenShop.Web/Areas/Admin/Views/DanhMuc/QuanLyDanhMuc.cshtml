@@ -1,0 +1,108 @@
+@model CategoryListViewModel
+@{
+    ViewData["Title"] = "Quản lý danh mục";
+}
+<partial name="_Assets" />
+<section class="category-page">
+    <header class="category-hero">
+        <div>
+            <span class="category-eyebrow"><i class="fa-solid fa-leaf me-2" aria-hidden="true"></i>GREENSHOP · DANH MỤC</span>
+            <h1>Quản lý danh mục</h1>
+            <p>Sắp xếp sản phẩm rõ ràng, quản lý bộ sưu tập dễ dàng.</p>
+        </div>
+        <a asp-action="ThemDanhMuc" class="btn category-primary"><i class="fa-solid fa-plus me-2" aria-hidden="true"></i>Thêm danh mục</a>
+    </header>
+
+    <partial name="_Feedback" />
+
+    <div class="category-stats" aria-label="Thống kê toàn bộ danh mục">
+        <div class="category-stat"><span class="category-stat-icon"><i class="fa-solid fa-layer-group" aria-hidden="true"></i></span><div><span>Tổng danh mục</span><strong>@Model.TotalCount</strong></div></div>
+        <div class="category-stat"><span class="category-stat-icon active"><i class="fa-solid fa-circle-check" aria-hidden="true"></i></span><div><span>Đang hoạt động</span><strong>@Model.ActiveCount</strong></div></div>
+        <div class="category-stat"><span class="category-stat-icon inactive"><i class="fa-solid fa-circle-pause" aria-hidden="true"></i></span><div><span>Ngừng hoạt động</span><strong>@Model.InactiveCount</strong></div></div>
+    </div>
+
+    <div class="category-panel">
+        <form asp-action="QuanLyDanhMuc" method="get" class="category-toolbar" role="search">
+            <div class="category-search">
+                <label for="categorySearch" class="form-label">Tìm danh mục</label>
+                <input id="categorySearch" name="search" value="@Model.Search" class="form-control" maxlength="100" placeholder="Nhập tên danh mục" />
+            </div>
+            <div class="category-filter">
+                <label for="categoryFilter" class="form-label">Trạng thái</label>
+                <select id="categoryFilter" asp-for="IsActive" name="isActive" class="form-select">
+                    <option value="">Tất cả trạng thái</option>
+                    <option value="true">Đang hoạt động</option>
+                    <option value="false">Ngừng hoạt động</option>
+                </select>
+            </div>
+            <button type="submit" class="btn category-primary"><i class="fa-solid fa-magnifying-glass me-2" aria-hidden="true"></i>Tìm kiếm</button>
+            @if (!string.IsNullOrEmpty(Model.Search) || Model.IsActive.HasValue)
+            {
+                <a asp-action="QuanLyDanhMuc" class="btn category-secondary">Xóa bộ lọc</a>
+            }
+        </form>
+        <div class="category-list-heading"><h2>Danh sách danh mục</h2><span>@Model.Categories.Count kết quả</span></div>
+
+        @if (Model.Categories.Count == 0)
+        {
+            <div class="category-empty">
+                <span class="category-empty-icon"><i class="fa-solid fa-seedling" aria-hidden="true"></i></span>
+                <h3>@(Model.TotalCount == 0 ? "Bắt đầu với danh mục đầu tiên" : "Không tìm thấy danh mục")</h3>
+                <p>@(Model.TotalCount == 0 ? "Tạo danh mục để tổ chức sản phẩm theo cách của bạn." : "Thử tên khác hoặc xóa bộ lọc để xem toàn bộ danh mục.")</p>
+                <a asp-action="@(Model.TotalCount == 0 ? "ThemDanhMuc" : "QuanLyDanhMuc")" class="btn category-primary">@(Model.TotalCount == 0 ? "Thêm danh mục" : "Xem tất cả")</a>
+            </div>
+        }
+        else
+        {
+            <div class="category-list">
+                @foreach (var category in Model.Categories)
+                {
+                    <article class="category-row" data-category-id="@category.Id">
+                        <div class="category-identity">
+                            <span class="category-row-icon"><i class="fa-solid fa-tags" aria-hidden="true"></i></span>
+                            <div class="category-copy">
+                                <a asp-action="ChiTietDanhMuc" asp-route-id="@category.Id" class="category-name">@category.Name</a>
+                                <p>@(string.IsNullOrEmpty(category.Description) ? "Chưa có mô tả." : category.Description)</p>
+                            </div>
+                        </div>
+                        <div class="category-meta"><span class="category-count"><i class="fa-solid fa-box-open me-1" aria-hidden="true"></i>@category.ProductCount sản phẩm</span><span class="category-badge @(category.IsActive ? "active" : "inactive")">@(category.IsActive ? "Hoạt động" : "Ngừng hoạt động")</span></div>
+                        <div class="category-actions">
+                            <a asp-action="SuaDanhMuc" asp-route-id="@category.Id" class="btn category-secondary btn-sm" aria-label="Sửa @category.Name"><i class="fa-solid fa-pen me-1" aria-hidden="true"></i>Sửa</a>
+                            <a asp-action="ChiTietDanhMuc" asp-route-id="@category.Id" class="btn category-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#categoryConfirmModal"
+                               data-confirm-action="@Url.Action("ThayDoiTrangThaiDanhMuc", new { id = category.Id })" data-confirm-name="@category.Name"
+                               data-confirm-status="@((!category.IsActive).ToString().ToLowerInvariant())" data-confirm-label="@(category.IsActive ? "Ngừng hoạt động" : "Bật hoạt động")"
+                               aria-label="Đổi trạng thái @category.Name"><i class="fa-solid fa-power-off me-1" aria-hidden="true"></i>@(category.IsActive ? "Tắt" : "Bật")</a>
+                            @if (category.ProductCount > 0)
+                            {
+                                <button type="button" class="btn category-danger btn-sm" disabled title="Chuyển sản phẩm sang danh mục khác trước khi xóa"><i class="fa-solid fa-lock me-1" aria-hidden="true"></i>Xóa</button>
+                            }
+                            else
+                            {
+                                <a asp-action="XoaDanhMuc" asp-route-id="@category.Id" class="btn category-danger btn-sm" data-bs-toggle="modal" data-bs-target="#categoryConfirmModal"
+                                   data-confirm-action="@Url.Action("XoaDanhMuc", new { id = category.Id })" data-confirm-name="@category.Name" data-confirm-label="Xóa danh mục"
+                                   aria-label="Xóa @category.Name"><i class="fa-solid fa-trash me-1" aria-hidden="true"></i>Xóa</a>
+                            }
+                        </div>
+                    </article>
+                }
+            </div>
+        }
+    </div>
+</section>
+
+<div class="modal fade category-dialog" id="categoryConfirmModal" tabindex="-1" aria-labelledby="categoryConfirmTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0"><h2 class="modal-title fs-5" id="categoryConfirmTitle">Xác nhận thao tác</h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button></div>
+            <div class="modal-body pt-0"><p class="fw-semibold" id="categoryConfirmName"></p><p id="categoryConfirmDescription" class="text-muted mb-0"></p></div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn category-secondary" data-bs-dismiss="modal">Hủy</button>
+                <form id="categoryConfirmForm" method="post" data-submit-once>
+                    @Html.AntiForgeryToken()
+                    <input id="categoryConfirmStatus" type="hidden" name="isActive" disabled />
+                    <button type="submit" class="btn category-primary" id="categoryConfirmSubmit"><span data-submit-label>Xác nhận</span></button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

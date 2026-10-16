@@ -1,0 +1,45 @@
+@model StoreCatalogViewModel
+@{ ViewData["Title"] = "Mang thiên nhiên gần hơn"; }
+<section class="shop-hero" aria-labelledby="hero-title">
+    <div class="hero-copy">
+        <span class="shop-eyebrow"><span class="hero-dot" aria-hidden="true"></span> GREENSHOP · MỘT CHÚT XANH MỖI NGÀY</span>
+        <h1 id="hero-title">Một góc xanh.<br />Một nhịp sống <em>mới.</em></h1>
+        <p>Để thiên nhiên trở thành một phần trong không gian của bạn. Tìm điều xanh yêu thích, bắt đầu từ những lựa chọn nhỏ.</p>
+        <div class="hero-actions"><a class="shop-btn primary" asp-controller="SanPham" asp-action="CuaHang">Khám phá cửa hàng <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>@if (Model.Categories.Count > 0) { <a class="shop-text-link" href="#discover-categories">Xem danh mục <i class="fa-solid fa-arrow-down" aria-hidden="true"></i></a> }</div>
+        <div class="hero-note"><span class="hero-note-line" aria-hidden="true"></span><span><strong>@Model.TotalCount sản phẩm</strong><br />Những lựa chọn đang có tại GreenShop</span></div>
+    </div>
+    <div class="hero-media" data-hero-slider role="region" aria-roledescription="trình chiếu" aria-label="Sản phẩm nổi bật">
+        <span class="hero-visual-label">A LITTLE GREEN, EVERY DAY</span>
+        @if (Model.HeroProducts.Count > 0)
+        {
+            <div class="hero-slider-viewport"><div class="hero-slider-track" data-hero-track>
+            @for (var index=0;index<Model.HeroProducts.Count;index++) {
+                var featured=Model.HeroProducts[index];
+                <div class="hero-slide" data-hero-slide data-product-id="@featured.Id" role="group" aria-roledescription="trang chiếu" aria-label="@(index+1) / @Model.HeroProducts.Count" aria-hidden="@(index>0 ? "true" : "false")" inert="@(index>0 ? "" : null)">
+                    <a asp-controller="SanPham" asp-action="ChiTietSanPham" asp-route-id="@featured.Id" class="hero-featured" draggable="false"><img src="@StoreDisplay.Image(featured.ImageUrl)" data-product-image alt="@featured.Name" width="640" height="760" fetchpriority="@(index==0 ? "high" : "auto")" loading="@(index<2 ? "eager" : "lazy")" draggable="false" /><div class="hero-caption"><span><small>KHÁM PHÁ HÔM NAY</small><strong>@featured.Name</strong></span><span class="hero-feature-price">@StoreDisplay.Money(featured.Price)<i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span></div></a>
+                    @if (!User.IsInRole("Admin")) { <div class="hero-purchase"><div><strong>@(featured.StockQuantity>0?"Thích góc xanh này?":"Sản phẩm tạm hết hàng")</strong><span>@(featured.StockQuantity>0?"Chọn mua và kiểm tra thông tin giao hàng.":"Khám phá thêm những lựa chọn đang có.")</span></div><form asp-controller="ThanhToan" asp-action="MuaNgay" asp-route-id="@featured.Id" method="post" data-submit-once><input type="hidden" name="Quantity" value="1" /><button class="shop-btn primary" type="submit" disabled="@(featured.StockQuantity<=0)">Mua ngay <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button></form></div> }
+                </div>
+            }
+            </div></div>
+            @if(Model.HeroProducts.Count>1) {
+                <div class="hero-slider-arrows"><button class="shop-icon-button" type="button" data-hero-prev aria-label="Sản phẩm nổi bật trước"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></button><button class="shop-icon-button" type="button" data-hero-next aria-label="Sản phẩm nổi bật tiếp theo"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button></div>
+                <div class="hero-slider-toolbar"><button class="shop-text-link" type="button" data-hero-pause aria-pressed="false">Tạm dừng tự trượt</button><span data-hero-counter>1 / @Model.HeroProducts.Count</span></div>
+                <p class="visually-hidden" data-hero-announcement role="status" aria-live="polite"></p>
+            }
+        }
+        else { <div class="hero-placeholder"><span class="botanical-art" aria-hidden="true"></span><span>Chờ một điều xanh mới</span></div> }
+        <span class="hero-orbit" aria-hidden="true"></span><span class="hero-stamp" aria-hidden="true"><i class="fa-solid fa-leaf"></i><span>GROW<br />YOUR SPACE</span></span>
+    </div>
+</section>
+<div class="botanical-divider" aria-hidden="true"><span>THIÊN NHIÊN GẦN HƠN</span><i class="fa-solid fa-seedling"></i><span>KHÔNG GIAN CỦA RIÊNG BẠN</span></div>
+@await Component.InvokeAsync("StoreNavigation", new { placement = "Discovery" })
+<section class="catalog-section home-carousel" aria-labelledby="home-products" data-product-carousel>
+    <div class="shop-section-heading"><div><span class="shop-eyebrow">NHỮNG LỰA CHỌN MỚI</span><h2 id="home-products">Một chút xanh dành cho bạn</h2></div><a class="shop-text-link" asp-controller="SanPham" asp-action="CuaHang">Xem tất cả <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div>
+    @if(Model.Products.Count>0) {
+        <div class="home-carousel-heading"><p>Kéo nhẹ để khám phá những điều xanh.</p><div class="home-carousel-arrows" data-carousel-controls hidden><button type="button" class="shop-icon-button" data-carousel-prev aria-label="Xem sản phẩm trước" aria-controls="home-product-track"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i></button><button type="button" class="shop-icon-button" data-carousel-next aria-label="Xem sản phẩm tiếp theo" aria-controls="home-product-track"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button></div></div>
+        <div class="home-carousel-track" id="home-product-track" data-carousel-track tabindex="0" role="region" aria-roledescription="trình trượt sản phẩm" aria-label="Sản phẩm mới, dùng phím trái phải hoặc kéo bằng chuột">@foreach(var product in Model.Products) { <partial name="_ProductCard" model="product" /> }</div>
+        <div class="home-carousel-footer" data-carousel-controls hidden><button type="button" class="home-carousel-toggle" data-carousel-toggle aria-pressed="false"><i class="fa-solid fa-pause" aria-hidden="true"></i><span>Tạm dừng tự trượt</span></button><div class="home-carousel-dots" data-carousel-dots aria-label="Chọn nhóm sản phẩm"></div><span class="home-carousel-counter" data-carousel-counter aria-hidden="true"></span></div>
+        <p class="visually-hidden" data-carousel-announcement role="status" aria-live="polite" aria-atomic="true"></p>
+    } else { <partial name="_ProductGrid" model="Model" /> }
+</section>
+<section class="home-closing"><span class="shop-eyebrow">BẮT ĐẦU TỪ MỘT GÓC NHỎ</span><h2>Thêm màu xanh.<br /><em>Thêm cảm hứng.</em></h2><a class="shop-btn secondary" asp-controller="SanPham" asp-action="CuaHang">Tìm sản phẩm của bạn <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a><span class="closing-botanical" aria-hidden="true"></span></section>

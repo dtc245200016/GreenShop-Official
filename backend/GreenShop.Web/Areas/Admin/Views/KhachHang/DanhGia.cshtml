@@ -1,0 +1,43 @@
+@model ShopReviewsViewModel
+@{ViewData["Title"]=Model.IsProductIndex?"Đánh giá theo sản phẩm":$"Đánh giá · {Model.ProductName}";}
+<section class="engagement-heading"><h1>@(Model.IsProductIndex?"Đánh giá theo sản phẩm":Model.ProductName)</h1><p>@(Model.IsProductIndex?"Chọn sản phẩm để xem đánh giá và phản hồi người mua. Huy hiệu đỏ là số đánh giá bạn chưa đọc.":"Xem nhận xét, hình ảnh và phản hồi khách đã nhận hàng. Điểm sản phẩm chỉ tính đánh giá hiện hành đang công khai.")</p></section>
+@if(!Model.IsProductIndex){<a class="btn btn-outline-secondary mb-3" asp-action="DanhGia"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Tất cả sản phẩm</a>}
+<section class="engagement-panel review-management">
+<form method="get" asp-action="DanhGia" class="review-filters" role="search" aria-label="Lọc đánh giá">
+    @if(!Model.IsProductIndex){<input type="hidden" name="productId" value="@Model.ProductId" />@if(Model.ReviewId!=null){<input type="hidden" name="reviewId" value="@Model.ReviewId" />}}
+    <div><label for="review-search">@(Model.IsProductIndex?"Tên sản phẩm":"Nội dung hoặc người mua")</label><input id="review-search" class="form-control" name="search" value="@Model.Search" maxlength="150" placeholder="@(Model.IsProductIndex?"Tìm sản phẩm…":"Tìm đánh giá…")" /></div>
+    @if(Model.IsProductIndex){<div><label for="review-category">Danh mục</label><select id="review-category" class="form-select" name="categoryId"><option value="">Tất cả danh mục</option>@foreach(var category in Model.Categories){<option value="@category.Id" selected="@(Model.CategoryId==category.Id)">@category.Name</option>}</select></div>}
+    <div><label for="review-scope">Đánh giá</label><select id="review-scope" class="form-select" name="scope"><option value="all" selected="@(Model.Scope=="all")">Tất cả</option><option value="unread" selected="@(Model.Scope=="unread")">Chưa đọc</option>@if(Model.IsProductIndex){<option value="with-reviews" selected="@(Model.Scope=="with-reviews")">Đã có đánh giá</option>}</select></div>
+    <div><label for="review-stars">Số sao</label><select id="review-stars" class="form-select" name="stars"><option value="">Tất cả số sao</option>@for(var star=5;star>=1;star--){<option value="@star" selected="@(Model.Stars==star)">@star sao</option>}</select></div>
+    <div><label for="review-visibility">Trạng thái</label><select id="review-visibility" class="form-select" name="visibility"><option value="all" selected="@(Model.Visibility=="all")">Tất cả trạng thái</option><option value="public" selected="@(Model.Visibility=="public")">Đang công khai</option><option value="hidden" selected="@(Model.Visibility=="hidden")">Đã ẩn</option><option value="archived" selected="@(Model.Visibility=="archived")">Bản lưu cũ</option></select></div>
+    <div class="review-filter-actions"><button type="submit" class="btn btn-success"><i class="fa-solid fa-filter" aria-hidden="true"></i> Lọc</button><a class="btn btn-outline-secondary" asp-action="DanhGia" asp-route-productId="@Model.ProductId">Bỏ lọc</a></div>
+</form>
+@if(Model.IsProductIndex){
+    <div class="review-product-list" aria-label="Sản phẩm và số đánh giá">
+    @if(Model.Products.Count==0){<p class="chat-empty">Không có sản phẩm phù hợp với bộ lọc.</p>}
+    @foreach(var product in Model.Products){
+        <a class="review-product-row" data-review-product="@product.Id" asp-action="DanhGia" asp-route-productId="@product.Id" asp-route-scope="@Model.Scope" asp-route-stars="@Model.Stars" asp-route-visibility="@Model.Visibility">
+            <img src="@StoreDisplay.Image(product.ImageUrl)" alt="@product.Name" width="64" height="64" loading="lazy" referrerpolicy="no-referrer" data-review-product-image />
+            <span class="review-product-info"><strong>@product.Name</strong><small>@product.CategoryName</small><span>@product.ReviewCount đánh giá @if(product.AverageStars!=null){<span class="review-product-rating">· ★ @product.AverageStars.Value.ToString("0.0")/5</span>}</span></span>
+            @if(product.UnreadCount>0){<span class="review-product-unread"><span class="shop-alert-badge" data-review-unread="@product.UnreadCount" aria-label="@product.UnreadCount đánh giá chưa đọc">@(product.UnreadCount>99?"99+":product.UnreadCount.ToString())</span><small>mới</small></span>}
+            <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+        </a>
+    }
+    </div>
+    @if(Model.ArchivedCount>0){<a class="review-archived-link" asp-action="DanhGia" asp-route-productId="0">Sản phẩm đã xóa · @Model.ArchivedCount đánh giá lưu lại @if(Model.ArchivedUnreadCount>0){<span class="shop-alert-badge" aria-label="@Model.ArchivedUnreadCount đánh giá chưa đọc">@Model.ArchivedUnreadCount</span>}</a>}
+}else{
+    @if(Model.Reviews.Count==0){<p class="chat-empty">Không có đánh giá phù hợp với bộ lọc.</p>}
+@foreach(var review in Model.Reviews){<div class="admin-review" data-admin-review="@review.Id"><header class="review-admin-heading"><strong>@review.ProductName</strong>@if(Model.UnreadIds.Contains(review.Id)){<span class="shop-alert-badge" aria-label="Đánh giá chưa đọc">Mới</span>}</header><p>@(review.IsCurrent?"Hiện hành":"Bản lưu cũ") · @(review.IsHidden?"Đã ẩn":"Công khai")</p>
+<form asp-action="AnHienDanhGia" asp-route-id="@review.Id" method="post"><input type="hidden" name="returnUrl" value="@(Context.Request.Path+Context.Request.QueryString)" /><input type="hidden" name="version" value="@review.Version" /><input type="hidden" name="hidden" value="@((!review.IsHidden).ToString().ToLowerInvariant())" /><button class="btn btn-outline-secondary" type="submit">@(review.IsHidden?"Hiện đánh giá":"Ẩn đánh giá")</button></form><partial name="~/Views/Shared/_ProductReviews.cshtml" model="@(new[]{review})" />@if(Model.UnreadIds.Contains(review.Id)){<form asp-action="DaDocDanhGia" asp-route-id="@review.Id" method="post" data-submit-once data-engagement-submit><input type="hidden" name="returnUrl" value="@(Context.Request.Path+Context.Request.QueryString)" /><button class="btn btn-outline-success" type="submit">Đánh dấu đã đọc</button></form>}@if(review.IsCurrent){
+<form asp-action="PhanHoiDanhGia" asp-route-id="@review.Id" method="post" class="review-reply-form" data-review-reply-form>
+    <input type="hidden" name="Version" value="@review.Version" />
+    <label for="reply-@review.Id">Phản hồi đánh giá</label>
+    <textarea id="reply-@review.Id" name="Content" rows="3" minlength="3" maxlength="1500" required placeholder="Gửi lời cảm ơn hoặc hỗ trợ khách hàng…">@review.ReplyContent</textarea>
+    <small>Phản hồi công khai từ GreenShop. Đánh giá đang ẩn sẽ chỉ hiển thị phản hồi khi được công khai lại.</small>
+    <div class="review-reply-actions"><button class="btn btn-success" type="submit">@(review.ReplyContent==null?"Lưu phản hồi":"Cập nhật phản hồi")</button><span role="status" aria-live="polite" data-reply-feedback></span></div>
+</form>
+}
+<a class="btn btn-outline-secondary" asp-action="TinNhan">Hộp thư khách hàng</a></div>}
+}
+<nav class="engagement-pagination" aria-label="Phân trang đánh giá">@if(Model.Page>1){<a class="btn btn-outline-secondary" asp-route-page="@(Model.Page-1)" asp-route-productId="@Model.ProductId" asp-route-reviewId="@Model.ReviewId" asp-route-search="@Model.Search" asp-route-categoryId="@Model.CategoryId" asp-route-stars="@Model.Stars" asp-route-scope="@Model.Scope" asp-route-visibility="@Model.Visibility">Trang trước</a>}<span>Trang @Model.Page</span>@if(Model.HasNext){<a class="btn btn-outline-secondary" asp-route-page="@(Model.Page+1)" asp-route-productId="@Model.ProductId" asp-route-reviewId="@Model.ReviewId" asp-route-search="@Model.Search" asp-route-categoryId="@Model.CategoryId" asp-route-stars="@Model.Stars" asp-route-scope="@Model.Scope" asp-route-visibility="@Model.Visibility">Trang sau</a>}</nav>
+</section>

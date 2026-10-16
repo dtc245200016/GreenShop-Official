@@ -1,0 +1,16 @@
+@model ProductFormViewModel
+@{
+    ViewData["Title"] = "Sửa sản phẩm";
+}
+
+<h2 class="fw-bold mb-4">Sửa sản phẩm</h2>
+<div class="card border-0 shadow-sm rounded-3">
+    <div class="card-body p-4">
+        <form asp-action="SuaSanPham" asp-route-id="@Model.ProductId" method="post" enctype="multipart/form-data">
+            <input asp-for="ExpectedStockQuantity" type="hidden" />
+            <partial name="_FormFields" model="Model" />
+            <button type="submit" class="btn btn-success"><i class="fa-solid fa-check me-1"></i>Lưu thay đổi</button>
+            <a asp-action="QuanLySanPham" class="btn btn-outline-secondary ms-2">Hủy</a>
+        </form>
+    </div>
+</div>

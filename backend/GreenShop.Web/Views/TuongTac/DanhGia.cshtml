@@ -1,0 +1,14 @@
+@model ReviewInput
+@{ ViewData["Title"]="Đánh giá sản phẩm"; }
+<section class="shop-page-heading"><span class="shop-eyebrow">GREENSHOP · TRẢI NGHIỆM CỦA BẠN</span><h1>Đánh giá sản phẩm</h1><p>@Model.ProductName · Đơn #@Model.OrderId đã giao thành công</p></section>
+<form asp-action="DanhGia" asp-route-id="@Model.OrderItemId" method="post" enctype="multipart/form-data" class="shop-panel review-form" data-submit-once>
+    <input type="hidden" asp-for="Version" /><input type="hidden" asp-for="ReviewId" />
+    @if(Model.Editing){<p>Đang sửa đánh giá của đơn hàng này. Không chọn ảnh mới để giữ ảnh cũ; chọn ảnh mới sẽ thay bộ ảnh hiển thị.</p>}
+    <div asp-validation-summary="All" class="text-danger" role="alert"></div>
+    <fieldset class="review-stars"><legend>Bạn hài lòng như thế nào?</legend>
+    @for(var star=1;star<=5;star++) { <label><input id="review-star-@star" type="radio" asp-for="Stars" value="@star" required /><span aria-hidden="true">★</span><span class="visually-hidden">@star sao</span></label> }
+    </fieldset><span asp-validation-for="Stars" class="text-danger"></span>
+    <div class="shop-field"><label asp-for="Content">Nhận xét của bạn</label><textarea asp-for="Content" rows="5" minlength="3" maxlength="1500" required placeholder="Chia sẻ trải nghiệm sử dụng sản phẩm…"></textarea><span asp-validation-for="Content" class="text-danger"></span></div>
+    <div class="shop-field"><label asp-for="Photos">Ảnh trải nghiệm (không bắt buộc)</label><input asp-for="Photos" type="file" multiple accept="image/jpeg,image/png,image/webp" /><small>Tối đa 5 ảnh JPG, PNG hoặc WebP; mỗi ảnh 2 MiB, tổng 5 MiB. Khi có lỗi, hãy chọn lại ảnh trước khi gửi.</small><span asp-validation-for="Photos" class="text-danger"></span></div>
+    <button class="shop-btn primary" type="submit">@(Model.Editing?"Lưu đánh giá":"Gửi đánh giá") <i class="fa-regular fa-paper-plane" aria-hidden="true"></i></button>
+</form>

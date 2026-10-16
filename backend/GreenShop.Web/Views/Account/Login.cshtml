@@ -1,0 +1,101 @@
+@model GreenShop.Web.Models.LoginViewModel
+@{
+    ViewData["Title"] = "Đăng Nhập - GreenShop";
+    Layout = "_AuthLayout";
+    var adminPortal=ViewData["AdminPortal"] is true;
+    if(adminPortal) ViewData["Title"]="Đăng nhập quản trị";
+}
+
+
+
+<div class="auth-container">
+    <div class="row g-0">
+        <!-- Banner Bên Trái -->
+        <div class="col-md-5 auth-banner d-none d-md-flex">
+            <h2 class="fw-bold mb-3">Chào mừng trở lại!</h2>
+            <p class="fs-6 opacity-90 mb-4">@(adminPortal ? "Không gian quản trị cửa hàng, đơn hàng và khách hàng của GreenShop." : "Những lựa chọn xanh đang chờ bạn. Đăng nhập để lưu giỏ hàng và xem đơn hàng của mình.")</p>
+            <div class="mt-auto">
+                <small class="opacity-75">🌿 GreenShop - Sống Xanh Mỗi Ngày</small>
+            </div>
+        </div>
+
+        <!-- Form Đăng Nhập Bên Phải -->
+        <div class="col-md-7 auth-form-wrapper">
+            <h3 class="fw-bold text-success mb-1">@(adminPortal ? "Đăng nhập quản trị" : "Đăng Nhập")</h3>
+            @if (ViewData["ReturnUrl"] is string)
+            {
+                <div class="alert alert-info" role="status">@(adminPortal ? "Vui lòng đăng nhập tài khoản Admin để tiếp tục quản lý." : "Vui lòng đăng nhập để tiếp tục mua sắm.")</div>
+            }
+
+            @if (TempData["SuccessMessage"] is string successMessage)
+            {
+                <div class="alert alert-success" role="status">@successMessage</div>
+            }
+
+            <form asp-route="@(adminPortal ? GreenShop.Web.Services.PortalAuthentication.AdminLoginRoute : GreenShop.Web.Services.PortalAuthentication.CustomerLoginRoute)" method="post" data-submit-once>
+                <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3 small"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label small fw-bold text-secondary">Địa chỉ Email</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa-regular fa-envelope text-muted"></i></span>
+                        <input asp-for="Email" class="form-control form-control-icon" placeholder="nguyenvana@gmail.com" />
+                    </div>
+                    <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label for="loginPassword" class="form-label small fw-bold text-secondary">Mật khẩu</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa-solid fa-lock text-muted"></i></span>
+                        <input asp-for="Password" type="password" id="loginPassword" class="form-control form-control-icon" placeholder="Nhập mật khẩu của bạn" />
+                        <button type="button" class="btn btn-outline-secondary" aria-label="Hiện hoặc ẩn mật khẩu" aria-pressed="false" onclick="togglePassword('loginPassword', this)">
+                            <i class="fa-regular fa-eye"></i>
+                        </button>
+                    </div>
+                    <span asp-validation-for="Password" class="text-danger small"></span>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="form-check">
+                        <input asp-for="RememberMe" class="form-check-input" />
+                        <label class="form-check-label small text-secondary" asp-for="RememberMe">Ghi nhớ đăng nhập</label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-success w-100 py-2.5 rounded-pill fw-bold shadow-sm">
+                    Đăng Nhập <i class="fa-solid fa-right-to-bracket ms-2"></i>
+                </button>
+            </form>
+            <p class="text-muted small text-center mt-3 mb-0">
+            @if(adminPortal) {
+                <a asp-route="CustomerLogin" class="text-success fw-bold text-decoration-none">Đăng nhập khách hàng</a>
+            } else {
+                <span>Bạn chưa có tài khoản?</span>
+                <a asp-controller="Account" asp-action="Register" asp-route-returnUrl="@ViewData["ReturnUrl"]" class="text-success fw-bold text-decoration-none">Đăng ký ngay</a>
+                <span class="d-block mt-3"><a asp-route="AdminLogin" class="text-success text-decoration-none">Đăng nhập quản trị</a></span>
+            }
+            </p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function togglePassword(inputId, btn) {
+            const input = document.getElementById(inputId);
+            const icon = btn.querySelector('i');
+            btn.setAttribute("aria-pressed", String(input.type === "password"));
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = "password";
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+    </script>
+}

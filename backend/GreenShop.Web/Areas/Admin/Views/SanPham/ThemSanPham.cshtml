@@ -1,0 +1,15 @@
+@model ProductFormViewModel
+@{
+    ViewData["Title"] = "Thêm sản phẩm";
+}
+
+<h2 class="fw-bold mb-4">Thêm sản phẩm</h2>
+<div class="card border-0 shadow-sm rounded-3">
+    <div class="card-body p-4">
+        <form asp-action="ThemSanPham" method="post" enctype="multipart/form-data">
+            <partial name="_FormFields" model="Model" />
+            <button type="submit" class="btn btn-success"><i class="fa-solid fa-check me-1"></i>Lưu sản phẩm</button>
+            <a asp-action="QuanLySanPham" class="btn btn-outline-secondary ms-2">Quay lại</a>
+        </form>
+    </div>
+</div>

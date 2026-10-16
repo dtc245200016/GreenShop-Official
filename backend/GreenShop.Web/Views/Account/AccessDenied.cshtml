@@ -1,0 +1,23 @@
+@{
+    ViewData["Title"] = "Không có quyền truy cập";
+    Context.Response.StatusCode = StatusCodes.Status403Forbidden;
+}
+
+<div class="row justify-content-center py-5">
+    <div class="col-md-8 col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4 text-center">
+            <div class="card-body p-5">
+                <i class="fa-solid fa-lock text-success fs-1 mb-3" aria-hidden="true"></i>
+                <h1 class="h3 fw-bold">Bạn không có quyền truy cập</h1>
+                <p class="text-muted my-3">
+                    Tài khoản của bạn không có quyền truy cập trang này.
+                    Vui lòng trở về trang chủ để tiếp tục sử dụng GreenShop.
+                </p>
+                <a asp-area="" asp-controller="Home" asp-action="Index"
+                   class="btn btn-success rounded-pill px-4">
+                    Trở về trang chủ
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

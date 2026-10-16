@@ -1,0 +1,96 @@
+@model StoreNavigationViewModel
+@{ var isAdmin = User.IsInRole("Admin"); var logoutRoute = isAdmin ? "AdminLogout" : "CustomerLogout"; }
+<header class="shop-header" data-shop-header>
+    <div class="shop-header-inner">
+        <div class="shop-header-top">
+        <a class="shop-brand" asp-area="" asp-controller="Home" asp-action="Index"><span class="shop-brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" focusable="false"><path d="M7 25C4 13 15 6 27 5C26 18 18 26 7 25ZM7 25L21 11" /></svg></span><span>GreenShop<small>SỐNG XANH MỖI NGÀY</small></span></a>
+        <div class="shop-account-nav">
+            @if (isAdmin) { <a class="shop-admin-return" asp-area="Admin" asp-controller="Admin" asp-action="TongQuan"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i><span>Quay lại quản trị</span></a> }
+            <button type="button" class="shop-icon-button" data-open-dialog="shop-search-dialog" aria-label="Mở tìm kiếm" aria-controls="shop-search-dialog" aria-haspopup="dialog"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i></button>
+            @if (!isAdmin) { <a class="shop-cart-link shop-icon-button" asp-area="" asp-controller="GioHang" asp-action="QuanLyGioHang" aria-label="Xem giỏ hàng"><i class="fa-solid fa-bag-shopping" aria-hidden="true"></i><span class="cart-count" aria-live="polite">@if (User.Identity?.IsAuthenticated == true) { @await Component.InvokeAsync("CartCount") } else { <text>(0)</text> }</span></a> }
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <details class="shop-menu account-menu" data-shop-menu>
+                    <summary class="shop-user" aria-label="Mở menu tài khoản"><i class="fa-regular fa-circle-user" aria-hidden="true"></i><span>@User.Identity.Name</span><i class="fa-solid fa-angle-down" aria-hidden="true"></i></summary>
+                    <div class="shop-menu-panel"><span class="menu-heading">TÀI KHOẢN CỦA BẠN</span><strong class="menu-user-name">@User.Identity.Name</strong>
+                        @if (!isAdmin) { <a asp-area="" asp-controller="ThanhToan" asp-action="DonHangCuaToi">Đơn hàng của tôi <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a> }
+                        <form asp-route="@logoutRoute" method="post" data-submit-once><button type="submit">Đăng xuất <i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i></button></form>
+                    </div>
+                </details>
+            }
+            else
+            {
+                <details class="shop-menu account-menu" data-shop-menu>
+                    <summary class="shop-user" aria-label="Mở menu tài khoản"><i class="fa-regular fa-circle-user" aria-hidden="true"></i><span>Đăng nhập</span><i class="fa-solid fa-angle-down" aria-hidden="true"></i></summary>
+                    <div class="shop-menu-panel"><span class="menu-heading">TÀI KHOẢN GREENSHOP</span>
+                        <a asp-area="" asp-controller="Account" asp-action="Login">Đăng nhập <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+                        <a asp-area="" asp-controller="Account" asp-action="Register">Đăng ký <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+                    </div>
+                </details>
+            }
+        </div>
+        </div>
+        <div class="botanical-navigation" data-botanical-nav>
+            <svg class="botanical-vine" viewBox="0 0 1200 156" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+                <defs>
+                    <linearGradient id="greenshop-leaf-shade" x1="0" y1="1" x2="1" y2="0"><stop stop-color="var(--leaf-base)" /><stop offset=".56" stop-color="var(--leaf-mid)" /><stop offset="1" stop-color="var(--leaf-tip)" /></linearGradient>
+                    <g id="greenshop-vine-leaf"><path d="M0 0C9-20 29-34 58-27C51-4 26 10 0 0Z" fill="url(#greenshop-leaf-shade)" /><path class="leaf-fold" d="M2-1Q29-22 56-27Q30-11 2-1Z" /><path class="leaf-veins" d="M0 0Q29-15 53-25M15-7L13-17M26-13L24-24M37-18L38-29M17-8L28-5M30-14L40-11" /></g>
+                </defs>
+                <g class="vine-stems"><path d="M8 78C70 2 132 2 194 78S318 154 380 78S504 2 566 78S690 154 752 78S876 2 938 78S1062 154 1124 78L1190 72" /><path d="M8 78C70 154 132 154 194 78S318 2 380 78S504 154 566 78S690 2 752 78S876 154 938 78S1062 2 1124 78" /></g>
+                <path class="vine-highlight" d="M8 76C70 0 132 0 194 76S318 152 380 76S504 0 566 76S690 152 752 76S876 0 938 76S1062 152 1124 76" />
+                @foreach (var x in new[] { 100, 286, 472, 658, 844, 1030 }) {
+                    var tilt = (x / 186 % 3 - 1) * 5;
+                    <g transform="translate(@x 24) rotate(@(-132+tilt))"><g class="vine-leaf" data-vine-position="@x"><use href="#greenshop-vine-leaf" transform="scale(.85)" /></g></g>
+                    <g transform="translate(@(x+3) 23) rotate(@(3-tilt))"><g class="vine-leaf" data-vine-position="@x"><use href="#greenshop-vine-leaf" transform="scale(1.06)" /></g></g>
+                    <g transform="translate(@(x-4) 128) rotate(-158)"><g class="vine-leaf" data-vine-position="@x"><use href="#greenshop-vine-leaf" transform="scale(.72)" /></g></g>
+                    <g transform="translate(@(x+2) 120) rotate(42)"><g class="vine-leaf" data-vine-position="@x"><use href="#greenshop-vine-leaf" transform="scale(.85)" /></g></g>
+                }
+                <path class="vine-tendril" d="M192 71Q201 40 207 53Q213 64 199 68M560 76Q573 42 578 55Q582 70 569 71M938 74Q950 43 955 54Q960 69 946 71" />
+            </svg>
+        <nav class="shop-main-nav" aria-label="Điều hướng chính">
+            <a asp-area="" asp-controller="Home" asp-action="Index" aria-current="@(Model.Controller == "Home" ? "page" : null)">Trang chủ</a>
+            <a asp-area="" asp-controller="SanPham" asp-action="CuaHang" aria-current="@(Model.Controller == "SanPham" && !Model.CategoryId.HasValue ? "page" : null)">Cửa hàng</a>
+            <details class="shop-menu category-menu" data-shop-menu>
+                <summary aria-current="@(Model.CategoryId.HasValue ? "page" : null)">Danh mục <i class="fa-solid fa-angle-down" aria-hidden="true"></i></summary>
+                <div class="shop-menu-panel"><span class="menu-heading">KHÁM PHÁ THEO DANH MỤC</span>
+                    <a asp-area="" asp-controller="SanPham" asp-action="CuaHang">Tất cả sản phẩm <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+                    @foreach (var category in Model.Categories)
+                    {
+                        <a asp-area="" asp-controller="SanPham" asp-action="CuaHang" asp-route-categoryId="@category.Id" aria-current="@(Model.CategoryId == category.Id ? "page" : null)"><span>@category.Name</span><small>@category.ProductCount</small></a>
+                    }
+                    @if (Model.Categories.Count == 0) { <p>Danh mục mới sẽ xuất hiện tại đây.</p> }
+                </div>
+            </details>
+            @if (!isAdmin && User.Identity?.IsAuthenticated == true)
+            {
+                <a asp-area="" asp-controller="ThanhToan" asp-action="DonHangCuaToi" aria-current="@(Model.Controller == "ThanhToan" && ViewContext.RouteData.Values["action"]?.ToString() == "DonHangCuaToi" ? "page" : null)">Đơn hàng của tôi</a>
+            }
+        </nav>
+        <div class="botanical-mobile-nav"><button type="button" class="shop-icon-button mobile-menu-toggle" data-open-dialog="shop-navigation-dialog" aria-label="Mở menu điều hướng" aria-controls="shop-navigation-dialog" aria-haspopup="dialog" aria-expanded="false"><i class="fa-solid fa-bars-staggered" aria-hidden="true"></i><span>Khám phá cửa hàng</span></button></div>
+        <div class="botanical-flower"><partial name="_ThemeToggle" /></div>
+        </div>
+    </div>
+</header>
+<dialog id="shop-search-dialog" class="shop-dialog search-dialog" aria-labelledby="shop-search-title">
+    <div class="dialog-heading"><h2 id="shop-search-title">Tìm điều xanh của bạn</h2><button type="button" class="shop-icon-button" data-close-dialog aria-label="Đóng tìm kiếm"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div>
+    <form asp-area="" asp-controller="SanPham" asp-action="CuaHang" method="get" class="header-search-form"><label for="header-search">Tên sản phẩm</label><div class="shop-search"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input id="header-search" name="search" value="@Model.Search" maxlength="150" placeholder="Bạn đang tìm sản phẩm nào?" autofocus /><button class="shop-btn primary" type="submit">Tìm kiếm <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button></div></form>
+    <p>Tìm theo tên hoặc <a asp-area="" asp-controller="SanPham" asp-action="CuaHang">khám phá tất cả sản phẩm</a>.</p>
+</dialog>
+<dialog id="shop-navigation-dialog" class="shop-dialog navigation-drawer" aria-labelledby="mobile-menu-title">
+    <div class="dialog-heading"><h2 id="mobile-menu-title">GreenShop</h2><button type="button" class="shop-icon-button" data-close-dialog aria-label="Đóng menu điều hướng" autofocus><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div>
+    <nav class="drawer-main-links" aria-label="Điều hướng mobile"><a asp-area="" asp-controller="Home" asp-action="Index" aria-current="@(Model.Controller == "Home" ? "page" : null)">Trang chủ <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a><a asp-area="" asp-controller="SanPham" asp-action="CuaHang" aria-current="@(Model.Controller == "SanPham" ? "page" : null)">Cửa hàng <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></nav>
+    <span class="menu-heading">DANH MỤC SẢN PHẨM</span><nav class="drawer-category-links" aria-label="Danh mục mobile">
+        <a asp-area="" asp-controller="SanPham" asp-action="CuaHang">Tất cả sản phẩm</a>
+        @foreach (var category in Model.Categories) { <a asp-area="" asp-controller="SanPham" asp-action="CuaHang" asp-route-categoryId="@category.Id" aria-current="@(Model.CategoryId == category.Id ? "page" : null)"><span>@category.Name</span><small>@category.ProductCount sản phẩm</small></a> }
+    </nav>
+    <div class="drawer-account"><span class="menu-heading">KHÔNG GIAN CỦA BẠN</span>@if (!isAdmin) { <a asp-area="" asp-controller="GioHang" asp-action="QuanLyGioHang">Giỏ hàng <i class="fa-solid fa-bag-shopping" aria-hidden="true"></i></a> }
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <p class="menu-user-name">@User.Identity.Name</p>
+            @if (isAdmin) { <a class="shop-admin-return" asp-area="Admin" asp-controller="Admin" asp-action="TongQuan"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i><span>Quay lại quản trị</span></a> }
+            else { <a asp-area="" asp-controller="ThanhToan" asp-action="DonHangCuaToi">Đơn hàng của tôi</a> }
+            <form asp-route="@logoutRoute" method="post" data-submit-once><button class="shop-btn secondary" type="submit">Đăng xuất</button></form>
+        }
+        else { <div class="drawer-auth-links"><a class="shop-btn primary" asp-area="" asp-controller="Account" asp-action="Login">Đăng nhập</a><a class="shop-btn secondary" asp-area="" asp-controller="Account" asp-action="Register">Đăng ký</a></div> }
+    </div>
+</dialog>

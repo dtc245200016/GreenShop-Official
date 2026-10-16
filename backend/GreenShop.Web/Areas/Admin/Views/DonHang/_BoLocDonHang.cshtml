@@ -1,0 +1,13 @@
+@model AdminOrderFilter
+<form asp-action="QuanLyDonHang" method="get" class="order-filter" role="search">
+    @if(Model.CustomerId.HasValue) { <input name="customerId" type="hidden" value="@Model.CustomerId" /> }
+    <div class="order-search-field"><label for="orderSearch">Tìm đơn hàng</label><div class="order-input-icon"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input id="orderSearch" name="search" value="@Model.Search" maxlength="100" placeholder="Mã đơn, tên khách hoặc email" /></div></div>
+    <div><label for="orderStatus">Trạng thái</label><select id="orderStatus" asp-for="Status" name="status"><option value="">Tất cả trạng thái</option>@foreach (var state in OrderWorkflow.States) { <option value="@((int)state)">@OrderWorkflow.Label(state)</option> }</select></div>
+    <div><label for="paymentMethod">Phương thức</label><select id="paymentMethod" asp-for="PaymentMethod" name="paymentMethod"><option value="">Tất cả phương thức</option><option value="COD">COD</option><option value="VIETQR">VietQR</option></select></div>
+    <div><label for="paymentState">Thanh toán</label><select id="paymentState" asp-for="PaymentState" name="paymentState"><option value="">Tất cả</option><option value="unpaid">Chưa thanh toán</option><option value="pending">Chờ kiểm tra chuyển khoản</option><option value="paid">Đã thanh toán</option></select></div>
+    <div><label for="fromDate">Từ ngày (UTC)</label><input id="fromDate" name="fromDate" type="date" value="@Model.FromDate?.ToString("yyyy-MM-dd")" /></div>
+    <div><label for="toDate">Đến hết ngày (UTC)</label><input id="toDate" name="toDate" type="date" value="@Model.ToDate?.ToString("yyyy-MM-dd")" /></div>
+    <div><label for="orderSort">Sắp xếp</label><select id="orderSort" asp-for="Sort" name="sort"><option value="newest">Mới nhất</option><option value="oldest">Cũ nhất</option><option value="total-desc">Tổng tiền giảm dần</option><option value="total-asc">Tổng tiền tăng dần</option></select></div>
+    <div><label for="pageSize">Số đơn / trang</label><select id="pageSize" asp-for="PageSize" name="pageSize"><option value="15">15 đơn</option><option value="30">30 đơn</option><option value="50">50 đơn</option></select></div>
+    <div class="order-filter-actions"><button class="order-btn primary" type="submit">Áp dụng bộ lọc</button>@if (Model.HasFilters) { <a class="order-btn secondary" asp-action="QuanLyDonHang">Xóa bộ lọc</a> }</div>
+</form>

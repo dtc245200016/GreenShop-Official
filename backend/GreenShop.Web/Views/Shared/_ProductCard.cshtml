@@ -1,0 +1,13 @@
+@model StoreProductViewModel
+<article class="shop-product-card" data-product-id="@Model.Id">
+    <a class="product-link" asp-controller="SanPham" asp-action="ChiTietSanPham" asp-route-id="@Model.Id">
+        <div class="product-media"><img src="@StoreDisplay.Image(Model.ImageUrl)" data-product-image alt="@Model.Name" loading="lazy" decoding="async" width="500" height="500" /><span class="product-category">@Model.CategoryName</span>@if (Model.StockQuantity <= 0) { <span class="stock-badge">Hết hàng</span> }<span class="product-discover" aria-hidden="true">Xem chi tiết <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></span></div>
+        <div class="product-copy"><span class="product-card-kicker">@Model.CategoryName</span><h3>@Model.Name</h3><p class="product-price">@StoreDisplay.Money(Model.Price)</p><p class="product-rating"><i class="fa-regular fa-star" aria-hidden="true"></i> @(Model.ReviewCount>0 ? $"{Model.AverageStars:N1}/5 · {Model.ReviewCount} đánh giá" : "Chưa có đánh giá")</p><div class="product-meta"><span>@(Model.SoldCount > 0 ? $"Đã bán {Model.SoldCount}" : "Chưa có dữ liệu bán")</span><span class="@(Model.StockQuantity <= 0 ? "stock-empty" : "stock-live")">@(Model.StockQuantity <= 0 ? "Hết hàng" : $"Còn {Model.StockQuantity} sản phẩm")</span></div></div>
+    </a>
+    @if (!User.IsInRole("Admin")) {
+    <div class="product-card-actions">
+        <form class="product-card-action" asp-controller="GioHang" asp-action="ThemVaoGioHang" asp-route-id="@Model.Id" method="post" data-submit-once><input type="hidden" name="Quantity" value="1" /><button class="shop-btn secondary" type="submit" title="Thêm vào giỏ" disabled="@(Model.StockQuantity <= 0)"><i class="fa-solid fa-cart-plus" aria-hidden="true"></i><span class="product-add-label">Thêm vào giỏ</span></button></form>
+        <form class="product-card-buy" asp-controller="ThanhToan" asp-action="MuaNgay" asp-route-id="@Model.Id" method="post" data-submit-once><input type="hidden" name="Quantity" value="1" /><button class="shop-btn primary" type="submit" disabled="@(Model.StockQuantity <= 0)">Mua ngay <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button></form>
+    </div>
+    }
+</article>

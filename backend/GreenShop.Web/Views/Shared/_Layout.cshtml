@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#123D2C" />
+    <script>try{const p=localStorage.getItem('greenshop.theme');document.documentElement.dataset.theme=p==='light'||p==='dark'?p:matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}catch{document.documentElement.dataset.theme=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}</script>
+    <title>@ViewData["Title"] · GreenShop</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/fontawesome/css/all.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/storefront.css" asp-append-version="true" />
+    <link rel="preload" href="~/fonts/be-vietnam-pro/be-vietnam-pro-400-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="~/fonts/be-vietnam-pro/be-vietnam-pro-400-vietnamese.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="~/css/admin-fonts.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/storefront-theme.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/customer-engagement.css" asp-append-version="true" />
+    @if(ViewContext.RouteData.Values["controller"]?.ToString() is "ThanhToan" or "GioHang") { <link rel="stylesheet" href="~/css/payment-shipping.css" asp-append-version="true" /> }
+</head>
+<body class="storefront">
+<a class="skip-link" href="#main-content">Đến nội dung chính</a>
+@await Component.InvokeAsync("StoreNavigation", new { placement = "Header" })
+<main id="main-content" class="shop-container" tabindex="-1">
+    <partial name="_ShopFeedback" />
+    @RenderBody()
+</main>
+@await Component.InvokeAsync("StoreNavigation", new { placement = "Footer" })
+<partial name="_HybridChat" />
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
+<script src="~/js/storefront.js" asp-append-version="true" defer></script>
+<script src="~/js/storefront-theme.js" asp-append-version="true" defer></script>
+<script src="~/lib/signalr/signalr.min.js" asp-append-version="true" defer></script>
+<script src="~/js/customer-engagement.js" asp-append-version="true" defer></script>
+@if(ViewContext.RouteData.Values["controller"]?.ToString() is "ThanhToan" or "GioHang") { <script src="~/js/payment-shipping.js" asp-append-version="true" defer></script> }
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
