@@ -76,6 +76,7 @@ public class SanPhamController : Controller
             ApplyForm(product, model);
             _db.Products.Add(product);
             await _db.SaveChangesAsync(cancellationToken);
+            Observability.BusinessCreated(_logger, HttpContext, "product.created");
             TempData["SuccessMessage"] = "Đã thêm sản phẩm.";
             return RedirectToAction(nameof(QuanLySanPham));
         }

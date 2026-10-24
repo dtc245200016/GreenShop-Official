@@ -1,0 +1,249 @@
+{
+  "status": "PASS",
+  "observed_utc": "2026-10-24T00:38:40.565084+00:00",
+  "image": "grafana/promtail:3.6.11@sha256:a761cb834cfaeee29745440d4884d6748f0a08d8f68928db1d707018c1dcfbe9",
+  "production_pipeline_sha256": "a72260f47e5492d463868b53925a0237d37d22e3118e4fb3d125d6f2b87628f2",
+  "method": "Exact production stages with pinned Promtail stdin dry-run; isolated loopback fake receiver for actual HTTP retry. No fixture sent to production/QA Loki.",
+  "cases": [
+    {
+      "name": "database_failure",
+      "status": "PASS"
+    },
+    {
+      "name": "normal_information",
+      "status": "PASS"
+    },
+    {
+      "name": "authentication_failure",
+      "status": "PASS"
+    },
+    {
+      "name": "authentication_success",
+      "status": "PASS"
+    },
+    {
+      "name": "access_denied",
+      "status": "PASS"
+    },
+    {
+      "name": "controlled_exception",
+      "status": "PASS"
+    },
+    {
+      "name": "query_exception",
+      "status": "PASS"
+    },
+    {
+      "name": "missing_optional",
+      "status": "PASS"
+    },
+    {
+      "name": "malformed_inner",
+      "status": "PASS"
+    },
+    {
+      "name": "non_object",
+      "status": "PASS"
+    },
+    {
+      "name": "nested_untrusted_scopes",
+      "status": "PASS"
+    },
+    {
+      "name": "malformed_outer",
+      "status": "PASS"
+    },
+    {
+      "name": "duplicate_a",
+      "status": "PASS"
+    },
+    {
+      "name": "duplicate_b",
+      "status": "PASS"
+    },
+    {
+      "name": "category.created",
+      "status": "PASS"
+    },
+    {
+      "name": "product.created",
+      "status": "PASS"
+    },
+    {
+      "name": "order.created",
+      "status": "PASS"
+    },
+    {
+      "name": "untrusted_Timestamp",
+      "status": "PASS"
+    },
+    {
+      "name": "untrusted_Category",
+      "status": "PASS"
+    },
+    {
+      "name": "untrusted_LogLevel",
+      "status": "PASS"
+    },
+    {
+      "name": "untrusted_EventId",
+      "status": "PASS"
+    },
+    {
+      "name": "untrusted_Exception",
+      "status": "PASS"
+    },
+    {
+      "name": "untrusted_event",
+      "status": "PASS"
+    },
+    {
+      "name": "untrusted_scope_fields",
+      "status": "PASS"
+    },
+    {
+      "name": "scope_null",
+      "status": "PASS"
+    },
+    {
+      "name": "scope_object",
+      "status": "PASS"
+    },
+    {
+      "name": "scope_nested",
+      "status": "PASS"
+    },
+    {
+      "name": "canary_password",
+      "status": "PASS"
+    },
+    {
+      "name": "canary_password_hash",
+      "status": "PASS"
+    },
+    {
+      "name": "canary_Authorization",
+      "status": "PASS"
+    },
+    {
+      "name": "canary_JWT",
+      "status": "PASS"
+    },
+    {
+      "name": "canary_session_cookie",
+      "status": "PASS"
+    },
+    {
+      "name": "canary_csrf_token",
+      "status": "PASS"
+    },
+    {
+      "name": "canary_connection_string",
+      "status": "PASS"
+    },
+    {
+      "name": "canary_Gemini_API_key",
+      "status": "PASS"
+    },
+    {
+      "name": "canary_webhook",
+      "status": "PASS"
+    },
+    {
+      "name": "canary_customer_email",
+      "status": "PASS"
+    },
+    {
+      "name": "canary_customer_phone",
+      "status": "PASS"
+    },
+    {
+      "name": "canary_customer_address",
+      "status": "PASS"
+    },
+    {
+      "name": "canary_login_body",
+      "status": "PASS"
+    },
+    {
+      "name": "canary_checkout_body",
+      "status": "PASS"
+    },
+    {
+      "name": "canary_AI_chat",
+      "status": "PASS"
+    },
+    {
+      "name": "canary_payment",
+      "status": "PASS"
+    }
+  ],
+  "nginx_cases": 9,
+  "mysql_cases": 2,
+  "secret_canary_classes": [
+    "password",
+    "password_hash",
+    "Authorization",
+    "JWT",
+    "session_cookie",
+    "csrf_token",
+    "connection_string",
+    "Gemini_API_key",
+    "webhook",
+    "customer_email",
+    "customer_phone",
+    "customer_address",
+    "login_body",
+    "checkout_body",
+    "AI_chat",
+    "payment"
+  ],
+  "canary_disclosure": false,
+  "framework_scope_sample": {
+    "schema_version": "2",
+    "timestamp_utc": "2026-10-17T01:02:03.123Z",
+    "service": "greenshop-web",
+    "level": "Error",
+    "category": "Microsoft.EntityFrameworkCore.Database.Connection",
+    "event_id": "20004",
+    "event": "",
+    "diagnostic_code": "db.connection.failed",
+    "diagnostic_message": "Database connection failed.",
+    "exception_type": "",
+    "request_id": "0HNPBLA2Q4DMF:00000001",
+    "trace_id": "602e253f0f538aff9d9e1243964e43b8",
+    "route": "health",
+    "reason_code": "",
+    "incident": ""
+  },
+  "controlled_exception_sample": {
+    "schema_version": "2",
+    "timestamp_utc": "2026-10-17T01:02:03.123Z",
+    "service": "greenshop-web",
+    "level": "Error",
+    "category": "Microsoft.AspNetCore.Diagnostics.ExceptionHandlerMiddleware",
+    "event_id": "1",
+    "event": "",
+    "diagnostic_code": "http.request.exception",
+    "diagnostic_message": "Unhandled exception during request; raw exception omitted.",
+    "exception_type": "System.InvalidOperationException",
+    "request_id": "0HNPBLA2Q4DMF:00000001",
+    "trace_id": "602e253f0f538aff9d9e1243964e43b8",
+    "route": "health",
+    "reason_code": "",
+    "incident": ""
+  },
+  "duplicate_behavior": "Two equal input records produce two equal sanitized records; no exactly-once guarantee.",
+  "retry_test": {
+    "first_status": 500,
+    "second_status": 204,
+    "identical_payload_retried": true,
+    "attempts": 2,
+    "accepted_batches": 1
+  },
+  "limits": [
+    "Known-format IDs are bounded and never promoted to stream labels. This is not proof against all unknown secrets in a deliberately forged identifier.",
+    "Unknown categories/types use generic diagnostic templates; raw messages and stack traces remain private Docker logs.",
+    "Acknowledgement loss after Loki accepts a batch may still duplicate logs; bounded retries may lose data during long outage."
+  ]
+}

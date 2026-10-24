@@ -1,0 +1,141 @@
+{
+  "uid": "greenshop-logs",
+  "title": "GreenShop — Logs & Incident Investigation",
+  "schemaVersion": 39,
+  "version": 5,
+  "tags": [
+    "GreenShop",
+    "M3"
+  ],
+  "timezone": "utc",
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "refresh": "30s",
+  "templating": {
+    "list": []
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Recent application events",
+      "type": "logs",
+      "datasource": {
+        "type": "loki",
+        "uid": "greenshop-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 10
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "{environment=\"main\",service=\"greenshop-web\"}",
+          "datasource": {
+            "type": "loki",
+            "uid": "greenshop-loki"
+          }
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      }
+    },
+    {
+      "id": 3,
+      "title": "HTTP errors",
+      "type": "logs",
+      "datasource": {
+        "type": "loki",
+        "uid": "greenshop-loki"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 12,
+        "h": 10
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "{environment=\"main\",service=\"nginx\"} | json | status >= 400 | __error__=\"\"",
+          "datasource": {
+            "type": "loki",
+            "uid": "greenshop-loki"
+          }
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      }
+    },
+    {
+      "id": 4,
+      "title": "MySQL operational events",
+      "type": "logs",
+      "datasource": {
+        "type": "loki",
+        "uid": "greenshop-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 10,
+        "w": 12,
+        "h": 10
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "{environment=\"main\",service=\"mysql\"}",
+          "datasource": {
+            "type": "loki",
+            "uid": "greenshop-loki"
+          }
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      }
+    },
+    {
+      "id": 5,
+      "title": "GS-SEC-001 timeline",
+      "type": "logs",
+      "datasource": {
+        "type": "loki",
+        "uid": "greenshop-loki"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 10,
+        "w": 12,
+        "h": 10
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "{environment=\"main\",service=\"greenshop-web\"} | json | incident=\"GS-SEC-001\" | __error__=\"\"",
+          "datasource": {
+            "type": "loki",
+            "uid": "greenshop-loki"
+          }
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      }
+    }
+  ]
+}

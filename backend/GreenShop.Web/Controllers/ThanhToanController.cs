@@ -61,6 +61,7 @@ public class ThanhToanController(AppDbContext db, ILogger<ThanhToanController> l
                 if(result.StatusCode==403) return Forbid();
                 if(result.OrderId>0)
                 {
+                    if(result.Created) Observability.BusinessCreated(logger, HttpContext, "order.created");
                     var method=await db.Orders.AsNoTracking().Where(o=>o.Id==result.OrderId && o.UserId==userId).Select(o=>o.PaymentMethod).SingleAsync(ct);
                     TempData["SuccessMessage"]=method==PaymentMethods.VietQr ? "Đã tạo đơn hàng. Quét mã để chuyển khoản; GreenShop sẽ xác nhận sau khi đối chiếu." : "Đã nhận đơn hàng COD. Đơn đang chờ xử lý, chưa thanh toán.";
                     return RedirectToAction(method==PaymentMethods.VietQr ? nameof(ThanhToanVietQR) : nameof(ChiTietDonHang),new {id=result.OrderId});

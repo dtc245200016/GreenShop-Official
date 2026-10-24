@@ -74,6 +74,16 @@ public sealed class Observability
             ["incident"]=name=="auth.login.failed"?"GS-SEC-001":"authentication" });
         logger.Log(level, new EventId(name=="auth.login.failed"?2001:name=="auth.login.succeeded"?2002:2003, name), "Security event {SecurityEvent}", name);
     }
+    // Emit only after successful persistence/commit. No identifiers or customer data.
+    public static void BusinessCreated(ILogger logger, HttpContext context, string name)
+    {
+        var id = name switch { "category.created" => 3001, "product.created" => 3002, "order.created" => 3003, _ => throw new ArgumentException("Unknown business event.", nameof(name)) };
+        using var scope = logger.BeginScope(new Dictionary<string, object> {
+            ["timestamp_utc"] = DateTimeOffset.UtcNow.ToString("O"), ["event"] = name,
+            ["service"] = "greenshop-web", ["request_id"] = context.TraceIdentifier,
+            ["route"] = RouteGroup(context), ["reason_code"] = "committed", ["incident"] = "business" });
+        logger.LogInformation(new EventId(id, name), "Committed business event {BusinessEvent}", name);
+    }
     public static string RouteGroup(HttpContext c)
     {
         var p=c.Request.Path;

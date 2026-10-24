@@ -1,0 +1,90 @@
+# Docker syslog UDP1514 (loopback) -> non-root Promtail -> Loki. No CIDs or Docker socket.
+# Static labels below; service comes from the three allowed RFC5424 APP-NAME values.
+# Closed templates retain safe events/metadata only; raw messages and identities never leave the host.
+server: {http_listen_port: 9080, grpc_listen_port: 0}
+positions: {filename: /positions/positions.yml, sync_period: 5s}
+clients:
+- {url: 'http://loki:3100/loki/api/v1/push', batchwait: 1s, batchsize: 262144, timeout: 10s, backoff_config: {min_period: 500ms,
+    max_period: 10s, max_retries: 20}}
+scrape_configs:
+- job_name: greenshop-syslog
+  syslog:
+    listen_address: 0.0.0.0:1514
+    listen_protocol: udp
+    idle_timeout: 60s
+    max_message_length: 65536
+    label_structured_data: false
+    labels: {environment: main, project: dtc245200016_btl_tkqt_htpm, source: docker, job: greenshop}
+  relabel_configs:
+  - {source_labels: [__syslog_message_app_name], regex: (nginx|greenshop-web|mysql), action: keep}
+  - {source_labels: [__syslog_message_app_name], target_label: service}
+  pipeline_stages:
+  - match:
+      selector: '{service="greenshop-web"}'
+      stages:
+      - json: {expressions: {ts: Timestamp, level: LogLevel, category: Category, event_id: EventId, event: State.SecurityEvent
+              || State.BusinessEvent, request_id: 'Scopes[?event] | [0].request_id', route: 'Scopes[?event] | [0].route',
+            reason: 'Scopes[?event] | [0].reason_code', incident: 'Scopes[?event] | [0].incident', framework_request_id: 'Scopes[?RequestId]
+              | [0].RequestId', request_path: 'Scopes[?RequestPath] | [0].RequestPath', trace_id: 'Scopes[?TraceId] | [0].TraceId',
+            exception: Exception}}
+      - template:
+          source: safe
+          template: |-
+            {{- /* Raw Message/State/Scopes/Exception are never output. Closed diagnostic templates only. */ -}}
+            {{- $categories := list "GreenShop.Web.Services.Observability" "GreenShop.Web.Areas.Admin.Controllers.DanhMucController" "GreenShop.Web.Areas.Admin.Controllers.SanPhamController" "GreenShop.Web.Controllers.ThanhToanController" "Microsoft.EntityFrameworkCore.Database.Connection" "Microsoft.EntityFrameworkCore.Database.Command" "Microsoft.EntityFrameworkCore.Query" "Microsoft.EntityFrameworkCore.Migrations" "Microsoft.AspNetCore.Diagnostics.ExceptionHandlerMiddleware" "Microsoft.AspNetCore.Server.Kestrel" "Microsoft.AspNetCore.Hosting.Diagnostics" "Microsoft.Hosting.Lifetime" "Microsoft.AspNetCore.DataProtection.KeyManagement.XmlKeyManager" "Microsoft.AspNetCore.DataProtection.Repositories.FileSystemXmlRepository" "Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware" -}}
+            {{- $category := "unrecognized" -}}{{- if has (.category | default "") $categories -}}{{- $category = .category -}}{{- end -}}
+            {{- $level := "unknown" -}}{{- if has (.level | default "") (list "Trace" "Debug" "Information" "Warning" "Error" "Critical" "None") -}}{{- $level = .level -}}{{- end -}}
+            {{- $id := "" -}}{{- if regexMatch "^[0-9]{1,6}$" (.event_id | default "") -}}{{- $id = .event_id -}}{{- end -}}
+            {{- $ts := "" -}}{{- if regexMatch "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}([.][0-9]{1,7})?Z$" (.ts | default "") -}}{{- $ts = .ts -}}{{- end -}}
+            {{- $request := .request_id | default .framework_request_id | default "" -}}{{- if not (regexMatch "^[0-9A-V]{13}:[0-9A-F]{8}$" $request) -}}{{- $request = "" -}}{{- end -}}
+            {{- $trace := .trace_id | default "" -}}{{- if not (regexMatch "^[0-9a-f]{32}$" $trace) -}}{{- $trace = "" -}}{{- end -}}
+            {{- $route := "" -}}{{- if has (.route | default "") (list "admin" "authentication" "catalog" "cart" "orders" "engagement" "support" "health" "home" "other") -}}{{- $route = .route -}}{{- else if .request_path -}}
+            {{- $route = "other" -}}{{- range $pattern, $group := dict "(?i)^/Admin(/|$)" "admin" "(?i)^/Account(/|$)" "authentication" "(?i)^/SanPham(/|$)" "catalog" "(?i)^/GioHang(/|$)" "cart" "(?i)^/ThanhToan(/|$)" "orders" "(?i)^/TuongTac(/|$)" "engagement" "(?i)^/(supportHub|TroLy)(/|$)" "support" "(?i)^/health(/|$)" "health" "^/$" "home" -}}{{- if regexMatch $pattern $.request_path -}}{{- $route = $group -}}{{- end -}}{{- end -}}{{- end -}}
+            {{- $event := "" -}}{{- $reason := "" -}}{{- $incident := "" -}}
+            {{- if eq $category "GreenShop.Web.Services.Observability" -}}
+            {{- if and (eq $id "2001") (eq (.event | default "") "auth.login.failed") -}}{{- $event = "auth.login.failed" -}}{{- $reason = "invalid_credentials" -}}{{- $incident = "GS-SEC-001" -}}
+            {{- else if and (eq $id "2002") (eq (.event | default "") "auth.login.succeeded") -}}{{- $event = "auth.login.succeeded" -}}{{- $reason = "cookie_issued" -}}{{- $incident = "authentication" -}}
+            {{- else if and (eq $id "2003") (eq (.event | default "") "auth.access.denied") -}}{{- $event = "auth.access.denied" -}}{{- $incident = "authentication" -}}{{- if has (.reason | default "") (list "role_forbidden" "portal_role_mismatch") -}}{{- $reason = .reason -}}{{- end -}}{{- end -}}{{- end -}}
+            {{- if or (and (eq $category "GreenShop.Web.Areas.Admin.Controllers.DanhMucController") (eq $id "3001") (eq (.event | default "") "category.created")) (and (eq $category "GreenShop.Web.Areas.Admin.Controllers.SanPhamController") (eq $id "3002") (eq (.event | default "") "product.created")) (and (eq $category "GreenShop.Web.Controllers.ThanhToanController") (eq $id "3003") (eq (.event | default "") "order.created")) -}}{{- $event = .event -}}{{- $reason = "committed" -}}{{- $incident = "business" -}}{{- end -}}
+            {{- $code := "application.unclassified" -}}{{- $message := "Application event; raw payload omitted." -}}
+            {{- $key := printf "%s#%s" $category $id -}}
+            {{- if eq $key "Microsoft.EntityFrameworkCore.Database.Connection#20004" -}}{{- $code = "db.connection.failed" -}}{{- $message = "Database connection failed." -}}
+            {{- else if eq $key "Microsoft.EntityFrameworkCore.Database.Command#20102" -}}{{- $code = "db.command.failed" -}}{{- $message = "Database command failed; SQL and parameters omitted." -}}
+            {{- else if eq $key "Microsoft.EntityFrameworkCore.Query#10100" -}}{{- $code = "db.query.failed" -}}{{- $message = "Database query processing failed." -}}
+            {{- else if eq $category "Microsoft.EntityFrameworkCore.Migrations" -}}{{- $code = "db.migration.event" -}}{{- $message = "Database migration lifecycle event." -}}
+            {{- else if eq $category "Microsoft.Hosting.Lifetime" -}}{{- $code = "application.lifecycle" -}}{{- $message = "Application lifecycle event." -}}
+            {{- else if eq $key "Microsoft.AspNetCore.Diagnostics.ExceptionHandlerMiddleware#1" -}}{{- $code = "http.request.exception" -}}{{- $message = "Unhandled exception during request; raw exception omitted." -}}
+            {{- else if $event -}}{{- $code = $event -}}{{- if eq $incident "business" -}}{{- $message = "Business creation committed." -}}{{- else -}}{{- $message = "Authentication security event." -}}{{- end -}}
+            {{- else if eq $category "unrecognized" -}}{{- $code = "parse.unrecognized" -}}{{- $message = "Unrecognized or malformed application event; raw payload omitted." -}}{{- end -}}
+            {{- $exception := "" -}}{{- if regexMatch "^MySqlConnector[.]MySqlException([ (:])" (.exception | default "") -}}{{- $exception = "MySqlConnector.MySqlException" -}}{{- else if regexMatch "^System[.]InvalidOperationException([ :])" (.exception | default "") -}}{{- $exception = "System.InvalidOperationException" -}}{{- else if regexMatch "^System[.]TimeoutException([ :])" (.exception | default "") -}}{{- $exception = "System.TimeoutException" -}}{{- end -}}
+            {"schema_version":"2","timestamp_utc":{{ $ts | toJson }},"service":"greenshop-web","level":{{ $level | toJson }},"category":{{ $category | toJson }},"event_id":{{ $id | toJson }},"event":{{ $event | toJson }},"diagnostic_code":{{ $code | toJson }},"diagnostic_message":{{ $message | toJson }},"exception_type":{{ $exception | toJson }},"request_id":{{ $request | toJson }},"trace_id":{{ $trace | toJson }},"route":{{ $route | toJson }},"reason_code":{{ $reason | toJson }},"incident":{{ $incident | toJson }}}
+      - output: {source: safe}
+  - match:
+      selector: '{service="nginx"}'
+      stages:
+      - json: {expressions: {ts: timestamp_utc, method: method, status: status, duration: duration, route: route_group, upstream_status: upstream_status,
+            upstream_time: upstream_time}}
+      - template:
+          source: safe
+          template: |-
+            {{- $ts := "" -}}{{- if regexMatch "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(Z|[+-][0-9]{2}:[0-9]{2})$" (.ts | default "") -}}{{- $ts = .ts -}}{{- end -}}
+            {{- $method := "OTHER" -}}{{- if has (.method | default "") (list "GET" "POST" "PUT" "DELETE" "HEAD" "OPTIONS" "PATCH") -}}{{- $method = .method -}}{{- end -}}
+            {{- $status := "" -}}{{- if regexMatch "^[1-5][0-9]{2}$" (.status | default "") -}}{{- $status = .status -}}{{- end -}}
+            {{- $duration := "" -}}{{- if regexMatch "^[0-9]{1,8}([.][0-9]{1,6})?$" (.duration | default "") -}}{{- $duration = .duration -}}{{- end -}}
+            {{- $route := "unparsed_or_error" -}}{{- if has (.route | default "") (list "other" "home" "authentication" "admin" "catalog" "cart" "orders" "engagement" "support" "health" "metrics" "static") -}}{{- $route = .route -}}{{- end -}}
+            {{- $us := "" -}}{{- if regexMatch "^([1-5][0-9]{2}|-)([, :]+([1-5][0-9]{2}|-)){0,7}$" (.upstream_status | default "") -}}{{- $us = .upstream_status -}}{{- end -}}
+            {{- $ut := "" -}}{{- if regexMatch "^([0-9]{1,8}([.][0-9]{1,6})?|-)([, :]+([0-9]{1,8}([.][0-9]{1,6})?|-)){0,7}$" (.upstream_time | default "") -}}{{- $ut = .upstream_time -}}{{- end -}}
+            {"timestamp_utc":{{ $ts | toJson }},"kind":"nginx","method":{{ $method | toJson }},"status":{{ $status | toJson }},"duration":{{ $duration | toJson }},"route_group":{{ $route | toJson }},"upstream_status":{{ $us | toJson }},"upstream_time":{{ $ut | toJson }}}
+      - output: {source: safe}
+  - match:
+      selector: '{service="mysql"}'
+      stages:
+      - regex: {expression: '(?P<mysql_time>\d{4}-\d{2}-\d{2}T\S+)\s+\d+\s+\[(?P<severity>System|Warning|ERROR|Note)\]\s+\[(?P<code>MY-\d+)\]\s+\[(?P<component>Server|InnoDB|Repl)\]'}
+      - template:
+          source: safe
+          template: '{"kind":"mysql_operational","timestamp_utc":{{ .mysql_time | default "" | toJson }},"level":{{ .severity
+            | default "operational" | toJson }},"code":{{ .code | default "startup_or_unparsed" | toJson }},"component":{{
+            .component | default "entrypoint" | toJson }}}'
+      - output: {source: safe}
+  - labeldrop:
+    - filename

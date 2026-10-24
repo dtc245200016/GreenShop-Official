@@ -1,3 +1,4 @@
+using GreenShop.Web.Services;
 using GreenShop.Web.Data;
 using GreenShop.Web.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -62,6 +63,7 @@ public class DanhMucController : Controller
         try
         {
             await _db.SaveChangesAsync(cancellationToken);
+            Observability.BusinessCreated(_logger, HttpContext, "category.created");
             TempData["SuccessMessage"] = "Đã thêm danh mục.";
             return RedirectToAction(nameof(QuanLyDanhMuc));
         }

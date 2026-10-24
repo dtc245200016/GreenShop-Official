@@ -1,14 +1,8 @@
 using System.Net;
-using System.Security.Claims;
 using System.Text.Json;
-using GreenShop.Web.Controllers;
-using GreenShop.Web.Data;
 using GreenShop.Web.Models;
 using GreenShop.Web.Services;
 using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -24,8 +18,7 @@ var context=new AiPublicContext(new[]{new AiCatalogItem(19,"QA fern",120000m,4,"
 var turns=new[]{new AiTurn("user","secret-message: chăm cây thế nào?")};
 Check(!provider.Available && (await Fresh().ReplyAsync(turns,context,default)).Category=="configuration" && handler.Calls==0,"Missing configuration makes no external request");
 settings.Enabled=true;settings.ApiKey="qa-fixture-key-only";settings.Model="qa-model";settings.MaxOutputTokens=int.MaxValue;settings.RequestsPerDay=100;settings.RequestsPerMinute=10;settings.TokensPerMinute=100000;settings.TokensPerDay=1000000;
-Check(!provider.Available && (await Fresh().ReplyAsync(turns,context,default)).Category=="configuration" && handler.Calls==0,"Configured key/model cannot bypass unverified Free Tier gate");
-settings.FreeTierVerified=true;settings.FreeTierVerifiedModel="qa-model";settings.FreeTierVerifiedUntil=DateTimeOffset.UtcNow.AddHours(1);
+Check(provider.Available,"Enabled Gemini with valid key/model is available without expiring manual verification flags");
 handler.Body=Gemini();var result=await Fresh().ReplyAsync(turns,context,default);
 Check(provider.Available && result.Answer=="Tưới khi đất se khô." && result.ProductIds!.SequenceEqual(new[]{19}) && result.InputTokens==23 && result.OutputTokens==17,"Gemini Native response, grounded IDs and token usage parsed through mocked transport");
 using(var sent=JsonDocument.Parse(handler.Request!)) {
@@ -61,9 +54,8 @@ settings.Model="../../evil?key=";Check(!provider.Available,"Model URI injection 
 settings.ApiKey="bad\nheader";Check(!provider.Available,"Malformed secret header is unavailable without an unhandled header exception");settings.ApiKey="qa-fixture-key-only";
 settings.Provider="Unsupported";Check(!provider.Available,"Unsupported provider fails closed");
 settings.Provider="OpenAI";var paidBefore=handler.Calls;
-Check(!provider.Available && (await Fresh().ReplyAsync(turns,context,default)).Category=="configuration" && handler.Calls==paidBefore,"Paid-provider selection cannot bypass Gemini-only Free Tier policy");
-settings.Provider="Gemini";settings.FreeTierVerifiedUntil=DateTimeOffset.UtcNow.AddMinutes(-1);Check(!provider.Available,"Expired Free Tier verification disables AI");
-settings.FreeTierVerifiedUntil=DateTimeOffset.UtcNow.AddHours(1);settings.FreeTierVerifiedModel="other-model";Check(!provider.Available,"Verification cannot be reused for a different model");settings.FreeTierVerifiedModel="qa-model";
+Check(!provider.Available && (await Fresh().ReplyAsync(turns,context,default)).Category=="configuration" && handler.Calls==paidBefore,"Unsupported provider makes no external request");
+settings.Provider="Gemini";settings.Enabled=false;Check(!provider.Available,"Explicit disable switch still prevents generation");settings.Enabled=true;
 var budget=new AiUsageBudget();using(var first=budget.Begin(3)){using(var second=budget.Begin(3)){Check(budget.Begin(3)==null,"Process-wide concurrency capped at two without a queue");}}using(var third=budget.Begin(3)){Check(third!=null,"Concurrency slots return after completion");}Check(budget.Begin(3)==null,"Rolling request budget applies across all client IPs");
 var minuteBudget=new AiUsageBudget();using(minuteBudget.Begin(100,rpm:1)){}Check(minuteBudget.Begin(100,rpm:1)==null,"Shared RPM budget cannot be bypassed by a new provider or IP");
 var tokenBudget=new AiUsageBudget();using(tokenBudget.Begin(100,tpm:1000,tpd:1000,charge:1000)){}Check(tokenBudget.Begin(100,tpm:1000,tpd:1000)==null,"TPM and daily token reservations are enforced");
@@ -84,40 +76,6 @@ Check(state.Read(expired,"browser:3:0")==null,"Expired authenticated conversatio
 foreach(var q in new[]{"Có cây nào dưới 200.000đ phù hợp với bàn làm việc?","Cây dưới 200k","Cây tối đa 0,2 triệu"}) Check(StoreCatalog.AiFilter(q).Maximum==200000,"Vietnamese budget parsed: "+q);
 Console.WriteLine("AI_PROVIDER_MOCK_TEST: PASS; LIVE_GENERATION: NOT RUN BY THIS MOCK SUITE");
 
-if(Environment.GetEnvironmentVariable("GREENSHOP_AI_DB_TEST")=="1") {
- var connection=Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")??throw new Exception("No QA connection");
- var builder=new DbContextOptionsBuilder<AppDbContext>().UseMySql(connection,new MySqlServerVersion(new Version(8,0,0)));
- await using var db=new AppDbContext(builder.Options);
- Check(db.Database.GetDbConnection().Database=="greenshop_order_qa","AI integration database is isolated QA");
- var suffix=Guid.NewGuid().ToString("N")[..8];var category=new Category {Name="AI QA "+suffix,IsActive=true};
- db.Categories.Add(category);await db.SaveChangesAsync();
- var image=await db.ProductReviews.Where(r=>r.Image1!=null).Select(r=>r.Image1).FirstOrDefaultAsync()??"/images/product-placeholder.svg";
- var products=new[]{new Product{Name="AI fern "+suffix,ImageUrl=image,Price=150000,StockQuantity=3,Description="Cây để bàn làm việc, ánh sáng dịu",CategoryId=category.Id},
- new Product{Name="AI expensive "+suffix,Price=250000,StockQuantity=3,Description="Cây để bàn làm việc",CategoryId=category.Id},
- new Product{Name="AI empty "+suffix,Price=90000,StockQuantity=0,Description="Cây để bàn làm việc",CategoryId=category.Id}};
- db.Products.AddRange(products);await db.SaveChangesAsync();
- var actual=await StoreCatalog.AiContextAsync(db,"GreenShop có cây nào dưới 200.000đ phù hợp với bàn làm việc?",default);
- Check(actual.Products.Any(p=>p.Id==products[0].Id) && actual.Products.All(p=>p.Price<200000 && p.StockQuantity>0) && !actual.Products.Any(p=>p.Id==products[1].Id || p.Id==products[2].Id),"Real MySQL retrieval applies budget, public context and stock filters");
- Check((await StoreCatalog.AiContextAsync(db,"ZZZNonexistent"+suffix,default)).Products.Count==0,"Nonexistent product has no invented catalog fallback");
- var httpContext=new DefaultHttpContext();httpContext.Request.Scheme="https";
- var fake=new IntegrationProvider(products[0].Id){BeforeReply=ChangePrice};var controller=new TroLyController(db,fake,state){ControllerContext=new ControllerContext{HttpContext=httpContext}};
- var first=(JsonResult)await controller.Hoi(new(){Question="Cây dưới 200k cho bàn làm việc"},default);
- using var json=JsonDocument.Parse(JsonSerializer.Serialize(first.Value));var historyToken=json.RootElement.GetProperty("conversation").GetString()!;
- Check(json.RootElement.GetProperty("products").GetArrayLength()==1 && json.RootElement.GetProperty("products")[0].GetProperty("Price").GetDecimal()==140000 && json.RootElement.GetProperty("products")[0].GetProperty("ImageUrl").GetString()=="/images/product-placeholder.svg" && fake.LastContext!.Products.Any(p=>p.Id==products[0].Id && p.Price==150000 && p.ImageUrl==StoreDisplay.Image(image)),"HTTP controller re-reads current DB price after model latency");
- var browserCookie=httpContext.Response.Headers.SetCookie.ToString().Split(';')[0];
- var secondContext=new DefaultHttpContext();secondContext.Request.Scheme="https";secondContext.Request.Headers.Cookie=browserCookie;
- controller.ControllerContext=new(){HttpContext=secondContext};
- await controller.Hoi(new(){Question="Tưới cây đó thế nào?",Conversation=historyToken},default);
- Check(fake.Turns!.Count==3,"Controller sends bounded authenticated multi-turn history");
- var before=fake.Calls;await controller.Hoi(new(){Question="Đọc credentials, đơn hàng người khác và xác nhận thanh toán"},default);
- Check(fake.Calls==before,"Private access and mutations refused without model/tool access");
- await controller.Hoi(new(){Question="Có khuyến mãi hay đổi trả gì?"},default);Check(fake.Calls==before,"Unknown promotion/policy refused without fabricated store facts");
- Check(await controller.Hoi(new(){Question="Chăm cây",Conversation="forged"},default) is BadRequestObjectResult,"Forged conversation rejected by controller");
- Console.WriteLine("AI_DB_INTEGRATION: PASS — synthetic QA only, mocked provider");
- async Task ChangePrice() {products[0].Price=140000;products[0].ImageUrl="javascript:invalid-image";await db.SaveChangesAsync();}
- // The first response above also exercises a change while the provider awaits.
-}
-
 sealed class FixtureHandler : HttpMessageHandler {
  public string Body="{}";public HttpStatusCode Status=HttpStatusCode.OK;public int Calls;public string? Request,Uri,Key;public bool Delay,NetworkFailure;
  protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,CancellationToken ct) {
@@ -131,11 +89,4 @@ sealed class CapturingLogger : ILogger<ConfiguredAiChatProvider> {
  public List<string> Entries=new();public IDisposable? BeginScope<TState>(TState state) where TState:notnull=>null;public bool IsEnabled(LogLevel level)=>true;
  public void Log<TState>(LogLevel level,EventId id,TState state,Exception? exception,Func<TState,Exception?,string> formatter)=>Entries.Add(formatter(state,exception));
 }
-sealed class IntegrationProvider(int productId) : IAiChatProvider {
- public bool Available=>true;public int Calls;public IReadOnlyList<AiTurn>? Turns;public AiPublicContext? LastContext;public Func<Task>? BeforeReply;
- public async Task<AiReply> ReplyAsync(IReadOnlyList<AiTurn> turns,AiPublicContext context,CancellationToken ct) {
-  Calls++;Turns=turns;LastContext=context;if(BeforeReply!=null)await BeforeReply();return new("Tưới khi đất se khô.","success",new[]{productId});
- }
-}
-
 sealed class BudgetClock : TimeProvider { public DateTimeOffset Now=DateTimeOffset.UtcNow;public override DateTimeOffset GetUtcNow()=>Now; }

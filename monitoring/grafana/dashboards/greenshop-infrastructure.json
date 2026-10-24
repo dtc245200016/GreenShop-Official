@@ -2,16 +2,16 @@
   "uid": "greenshop-infrastructure",
   "title": "GreenShop — Infrastructure Overview",
   "schemaVersion": 39,
-  "version": 1,
+  "version": 4,
   "editable": false,
   "tags": [
     "greenshop",
     "m2"
   ],
   "timezone": "browser",
-  "refresh": "10s",
+  "refresh": "30s",
   "time": {
-    "from": "now-15m",
+    "from": "now-1h",
     "to": "now"
   },
   "panels": [
@@ -23,8 +23,8 @@
       "gridPos": {
         "x": 0,
         "y": 0,
-        "w": 12,
-        "h": 8
+        "w": 24,
+        "h": 5
       },
       "datasource": {
         "type": "prometheus",
@@ -83,8 +83,8 @@
       "type": "timeseries",
       "description": "",
       "gridPos": {
-        "x": 12,
-        "y": 0,
+        "x": 0,
+        "y": 5,
         "w": 12,
         "h": 8
       },
@@ -95,8 +95,8 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum by (container_label_com_docker_compose_project,container_label_com_docker_compose_service) (rate(container_cpu_usage_seconds_total{container_label_com_docker_compose_project=~\"$project\",container_label_com_docker_compose_service!=\"\"}[2m]))",
-          "legendFormat": "{{container_label_com_docker_compose_project}} / {{container_label_com_docker_compose_service}}",
+          "expr": "sum by (container_label_com_docker_compose_project,container_label_com_docker_compose_service) (rate(container_cpu_usage_seconds_total{container_label_com_docker_compose_project=~\"dtc245200016_btl_tkqt_htpm\",container_label_com_docker_compose_service!=\"\"}[2m]))",
+          "legendFormat": "{{container_label_com_docker_compose_service}}",
           "range": true
         }
       ],
@@ -143,10 +143,10 @@
       "id": 3,
       "title": "Container Memory Usage",
       "type": "timeseries",
-      "description": "",
+      "description": "One Main container per service. Max avoids adding the old and new cgroup memory together briefly during container recreation.",
       "gridPos": {
-        "x": 0,
-        "y": 8,
+        "x": 12,
+        "y": 5,
         "w": 12,
         "h": 8
       },
@@ -157,8 +157,8 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum by (container_label_com_docker_compose_project,container_label_com_docker_compose_service) (container_memory_working_set_bytes{container_label_com_docker_compose_project=~\"$project\",container_label_com_docker_compose_service!=\"\"})",
-          "legendFormat": "{{container_label_com_docker_compose_project}} / {{container_label_com_docker_compose_service}}",
+          "expr": "max by (container_label_com_docker_compose_project,container_label_com_docker_compose_service) (container_memory_working_set_bytes{container_label_com_docker_compose_project=~\"dtc245200016_btl_tkqt_htpm\",container_label_com_docker_compose_service!=\"\"})",
+          "legendFormat": "{{container_label_com_docker_compose_service}}",
           "range": true
         }
       ],
@@ -207,8 +207,8 @@
       "type": "timeseries",
       "description": "",
       "gridPos": {
-        "x": 12,
-        "y": 8,
+        "x": 0,
+        "y": 13,
         "w": 12,
         "h": 8
       },
@@ -219,8 +219,8 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum by (container_label_com_docker_compose_project,container_label_com_docker_compose_service) (rate(container_network_receive_bytes_total{container_label_com_docker_compose_project=~\"$project\",container_label_com_docker_compose_service!=\"\"}[2m]) + rate(container_network_transmit_bytes_total{container_label_com_docker_compose_project=~\"$project\",container_label_com_docker_compose_service!=\"\"}[2m]))",
-          "legendFormat": "{{container_label_com_docker_compose_project}} / {{container_label_com_docker_compose_service}}",
+          "expr": "sum by (container_label_com_docker_compose_project,container_label_com_docker_compose_service) (rate(container_network_receive_bytes_total{container_label_com_docker_compose_project=~\"dtc245200016_btl_tkqt_htpm\",container_label_com_docker_compose_service!=\"\"}[2m]) + rate(container_network_transmit_bytes_total{container_label_com_docker_compose_project=~\"dtc245200016_btl_tkqt_htpm\",container_label_com_docker_compose_service!=\"\"}[2m]))",
+          "legendFormat": "{{container_label_com_docker_compose_service}}",
           "range": true
         }
       ],
@@ -264,79 +264,13 @@
       }
     },
     {
-      "id": 5,
-      "title": "Container Availability — seconds since last seen",
-      "type": "stat",
-      "description": "",
-      "gridPos": {
-        "x": 0,
-        "y": 16,
-        "w": 12,
-        "h": 8
-      },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "greenshop-prometheus"
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "expr": "time() - max by (container_label_com_docker_compose_project,container_label_com_docker_compose_service) (container_last_seen{container_label_com_docker_compose_project=~\"$project\",container_label_com_docker_compose_service!=\"\"})",
-          "legendFormat": "{{container_label_com_docker_compose_project}} / {{container_label_com_docker_compose_service}}",
-          "range": true
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "s",
-          "color": {
-            "mode": "thresholds"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "orange",
-                "value": 15
-              },
-              {
-                "color": "red",
-                "value": 30
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "multi"
-        },
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        }
-      }
-    },
-    {
       "id": 6,
       "title": "Nginx Connections",
       "type": "timeseries",
       "description": "",
       "gridPos": {
         "x": 12,
-        "y": 16,
+        "y": 13,
         "w": 12,
         "h": 8
       },
@@ -398,7 +332,7 @@
       "description": "",
       "gridPos": {
         "x": 0,
-        "y": 24,
+        "y": 21,
         "w": 12,
         "h": 8
       },
@@ -460,7 +394,7 @@
       "description": "",
       "gridPos": {
         "x": 12,
-        "y": 24,
+        "y": 21,
         "w": 12,
         "h": 8
       },
@@ -514,94 +448,12 @@
           "values": false
         }
       }
-    },
-    {
-      "id": 9,
-      "title": "Nginx Reading / Writing / Waiting",
-      "type": "timeseries",
-      "description": "",
-      "gridPos": {
-        "x": 0,
-        "y": 32,
-        "w": 12,
-        "h": 8
-      },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "greenshop-prometheus"
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "expr": "{__name__=~\"nginx_connections_(reading|writing|waiting)\"}",
-          "legendFormat": "{{__name__}}",
-          "range": true
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "color": {
-            "mode": "palette-classic"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 5
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "multi"
-        },
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        }
-      }
     }
   ],
   "annotations": {
     "list": []
   },
   "templating": {
-    "list": [
-      {
-        "name": "project",
-        "label": "Compose project",
-        "type": "query",
-        "datasource": {
-          "type": "prometheus",
-          "uid": "greenshop-prometheus"
-        },
-        "query": "label_values(container_last_seen, container_label_com_docker_compose_project)",
-        "refresh": 1,
-        "includeAll": true,
-        "allValue": ".*",
-        "multi": true,
-        "current": {
-          "text": "All",
-          "value": "$__all"
-        },
-        "options": []
-      }
-    ]
+    "list": []
   }
 }

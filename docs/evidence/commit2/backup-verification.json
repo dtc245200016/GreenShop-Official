@@ -1,6 +1,0 @@
-{
-  "status": "PASS",
-  "time": "2026-10-16T13:26:42.698900+00:00",
-  "mysql": "Restored into isolated greenshop_backup_verify schema; all table hashes match Main snapshot.",
-  "archives": "All members readable; sizes verified. Backups private outside Git."
-}

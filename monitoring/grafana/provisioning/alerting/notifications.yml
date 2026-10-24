@@ -1,3 +1,4 @@
+# Receiver UID is retained to preserve existing notification identity; destination is Main.
 apiVersion: 1
 contactPoints:
 - orgId: 1
@@ -7,7 +8,7 @@ contactPoints:
     type: webhook
     disableResolveMessage: false
     settings:
-      url: $QA_WEBHOOK_URL
+      url: $ALERT_WEBHOOK_URL
       httpMethod: POST
       title: GreenShop alert {{ .Status }}
       message: '{{ range .Alerts }}name={{ .Labels.alertname }} severity={{ .Labels.severity

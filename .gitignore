@@ -53,3 +53,8 @@ id_ed25519
 *.sql.zst
 *.dump
 *.dump.gz
+
+# Private M3 state backups must remain outside source control
+*.tar
+*.tar.gz
+*.tgz

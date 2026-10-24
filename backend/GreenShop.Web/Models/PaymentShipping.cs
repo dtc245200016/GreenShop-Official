@@ -43,7 +43,7 @@ public class PaymentShippingSettingsViewModel
 }
 public record CheckoutLine(int ProductId,string Name,string ImageUrl,decimal Price,int Quantity,int StockQuantity);
 public record CheckoutCartQuote(int UserId, IReadOnlyList<CheckoutLine> Items);
-public record CheckoutResult(int StatusCode,int OrderId,string Message);
+public record CheckoutResult(int StatusCode,int OrderId,string Message,bool Created=false);
 
 public static class PaymentMethods
 {

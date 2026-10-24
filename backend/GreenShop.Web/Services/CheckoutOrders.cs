@@ -80,6 +80,6 @@ public class CheckoutOrders(AppDbContext db,IDataProtectionProvider protection)
         if(!productId.HasValue) await db.CartItems.Where(i=>i.UserId==userId).ExecuteDeleteAsync(ct);
         await AdminNotifications.AddAsync(db,"order:"+order.Id,"Order","Đơn hàng mới #"+order.Id,"/Admin/DonHang/ChiTietDonHang/"+order.Id,ct);
         await transaction.CommitAsync(ct);
-        return new CheckoutResult(200,order.Id,"Đã nhận đơn hàng. Thanh toán được ghi nhận riêng.");
+        return new CheckoutResult(200,order.Id,"Đã nhận đơn hàng. Thanh toán được ghi nhận riêng.",Created:true);
     });
 }

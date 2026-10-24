@@ -1,6 +1,0 @@
-{
-  "status": "PASS",
-  "time": "2026-10-16T13:46:10.708981+00:00",
-  "method": "QA web temporarily ran the exact existing Main M1 image, preserving QA DB/keys/uploads. HTTPS readiness and genuine Customer login passed; then tested M2 image restored.",
-  "user_count_unchanged": true
-}

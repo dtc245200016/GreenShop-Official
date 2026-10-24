@@ -1,0 +1,595 @@
+{
+  "status": "PASS_WITH_DOCUMENTED_LIMITS",
+  "date_client": "2026-10-24",
+  "observed_epoch": 1792804522.5423188,
+  "compose_lines": 253,
+  "promtail_lines": 90,
+  "runtime": {
+    "web_app": {
+      "id": "f7b3622e322f35665f7a9dfa5b608b04ed11b42c6dcd5efc7bdb939a02cf8093",
+      "health": "healthy",
+      "uid": 1654,
+      "networks": [
+        "dtc245200016_btl_tkqt_htpm_app_net",
+        "dtc245200016_btl_tkqt_htpm_database_net",
+        "dtc245200016_btl_tkqt_htpm_monitoring_net"
+      ],
+      "oom": false,
+      "restart_policy": "always"
+    },
+    "grafana": {
+      "id": "4b38b5762ed0c0360639abb23e7107debcb4323c5008e6793e26c0314be84cfb",
+      "health": "healthy",
+      "uid": 472,
+      "networks": [
+        "dtc245200016_btl_tkqt_htpm_admin_net",
+        "dtc245200016_btl_tkqt_htpm_logging_net",
+        "dtc245200016_btl_tkqt_htpm_monitoring_net"
+      ],
+      "oom": false,
+      "restart_policy": "unless-stopped"
+    },
+    "prometheus": {
+      "id": "0ddc019d347e2ab74492280c0c237af49c4eebb40763d2de73629a4d13a4e38a",
+      "health": "healthy",
+      "uid": 65534,
+      "networks": [
+        "dtc245200016_btl_tkqt_htpm_admin_net",
+        "dtc245200016_btl_tkqt_htpm_monitoring_net"
+      ],
+      "oom": false,
+      "restart_policy": "unless-stopped"
+    },
+    "mysql-exporter": {
+      "id": "c594960c9a78b607aaf86e5925e25406189c6d2475f4c3ceb33d1f204774941a",
+      "health": "running",
+      "uid": 65534,
+      "networks": [
+        "dtc245200016_btl_tkqt_htpm_database_net",
+        "dtc245200016_btl_tkqt_htpm_monitoring_net"
+      ],
+      "oom": false,
+      "restart_policy": "unless-stopped"
+    },
+    "alert-receiver": {
+      "id": "734619b183030a735ae6aa457c66f275ca15a7d945f6f9d5c970af6d4dfb46d2",
+      "health": "healthy",
+      "uid": 65534,
+      "networks": [
+        "dtc245200016_btl_tkqt_htpm_monitoring_net"
+      ],
+      "oom": false,
+      "restart_policy": "unless-stopped"
+    },
+    "promtail": {
+      "id": "dda9585114931ca5118b05dd55bff10fa8e8afaa7cfcc6bfa08509e5372fa2eb",
+      "health": "healthy",
+      "uid": 10001,
+      "networks": [
+        "dtc245200016_btl_tkqt_htpm_admin_net",
+        "dtc245200016_btl_tkqt_htpm_logging_net"
+      ],
+      "oom": false,
+      "restart_policy": "unless-stopped"
+    },
+    "phpmyadmin": {
+      "id": "02bae735ea8d0f918ccb495a4dd6c391c2567a9a183e0a8be34dee96cfb048f9",
+      "health": "healthy",
+      "uid": 0,
+      "networks": [
+        "dtc245200016_btl_tkqt_htpm_admin_net",
+        "dtc245200016_btl_tkqt_htpm_database_net"
+      ],
+      "oom": false,
+      "restart_policy": "always"
+    },
+    "cadvisor": {
+      "id": "96f98c945289a700aee3c980141cd1a282744d1663468e00762f2035e00e8fa8",
+      "health": "healthy",
+      "uid": 0,
+      "networks": [
+        "dtc245200016_btl_tkqt_htpm_monitoring_net"
+      ],
+      "oom": false,
+      "restart_policy": "unless-stopped"
+    },
+    "nginx": {
+      "id": "c43908a187a083367d236be04373fd9371867f2013898c8f52e5a6ea2235a79a",
+      "health": "healthy",
+      "uid": 0,
+      "networks": [
+        "dtc245200016_btl_tkqt_htpm_app_net",
+        "dtc245200016_btl_tkqt_htpm_monitoring_net"
+      ],
+      "oom": false,
+      "restart_policy": "always"
+    },
+    "loki": {
+      "id": "ef4be4c5f3241d799e1476b539ed5d5faa8619353a4f739035fa0a501c2c6fb7",
+      "health": "healthy",
+      "uid": 10001,
+      "networks": [
+        "dtc245200016_btl_tkqt_htpm_logging_net"
+      ],
+      "oom": false,
+      "restart_policy": "unless-stopped"
+    },
+    "db": {
+      "id": "d46cdb13095dfd7c21232940832f306f972d4b1d4a6452c157a6911df766793a",
+      "health": "healthy",
+      "uid": 999,
+      "networks": [
+        "dtc245200016_btl_tkqt_htpm_database_net",
+        "dtc245200016_btl_tkqt_htpm_db_admin_net"
+      ],
+      "oom": false,
+      "restart_policy": "always"
+    },
+    "nginx-exporter": {
+      "id": "468d54337c2895bb2eb8ee0c89d52d1684ea08a8800e1b66fb97834d3cdecfeb",
+      "health": "running",
+      "uid": 1001,
+      "networks": [
+        "dtc245200016_btl_tkqt_htpm_monitoring_net"
+      ],
+      "oom": false,
+      "restart_policy": "unless-stopped"
+    }
+  },
+  "preservation": {
+    "env_bytes_unchanged": true,
+    "secret_files_exactly_unchanged": true,
+    "backend_exactly_unchanged": true,
+    "all15_tables_exactly_unchanged": {
+      "AdminNotifications": {
+        "rows": 19,
+        "all_original_values_unchanged": true
+      },
+      "CartItems": {
+        "rows": 8,
+        "all_original_values_unchanged": true
+      },
+      "Categories": {
+        "rows": 8,
+        "all_original_values_unchanged": true
+      },
+      "HomeSliderSettings": {
+        "rows": 1,
+        "all_original_values_unchanged": true
+      },
+      "OrderItems": {
+        "rows": 13,
+        "all_original_values_unchanged": true
+      },
+      "OrderStatusHistories": {
+        "rows": 51,
+        "all_original_values_unchanged": true
+      },
+      "Orders": {
+        "rows": 13,
+        "all_original_values_unchanged": true
+      },
+      "PaymentShippingSettings": {
+        "rows": 1,
+        "all_original_values_unchanged": true
+      },
+      "ProductReviews": {
+        "rows": 5,
+        "all_original_values_unchanged": true
+      },
+      "Products": {
+        "rows": 9,
+        "all_original_values_unchanged": true
+      },
+      "ShopConversationReads": {
+        "rows": 4,
+        "all_original_values_unchanged": true
+      },
+      "ShopConversations": {
+        "rows": 3,
+        "all_original_values_unchanged": true
+      },
+      "ShopMessages": {
+        "rows": 7,
+        "all_original_values_unchanged": true
+      },
+      "Users": {
+        "rows": 11,
+        "all_original_values_unchanged": true
+      },
+      "__EFMigrationsHistory": {
+        "rows": 10,
+        "all_original_values_unchanged": true
+      }
+    },
+    "persistent_files_exactly_unchanged": 11,
+    "volume_network_identities_unchanged": true,
+    "new_accounts": 0,
+    "business_writes": 0,
+    "password_changes": 0,
+    "no_new_backup": true
+  },
+  "grafana": {
+    "status": "PASS",
+    "restart_policy": "unless-stopped",
+    "volume": "dtc245200016_btl_tkqt_htpm_grafana_data",
+    "identity_preserved": true,
+    "actions": [
+      {
+        "action": "restart",
+        "container_id": "6b5d2b1e4bce16b26f7bf82a261bf1baed9d94611bac328d2b4f2facf35e0d7a",
+        "same_data_volume": true,
+        "existing_login": true,
+        "login_seconds": 0.138,
+        "live_query_seconds": 0.026,
+        "dashboards": 4,
+        "panels": 19,
+        "datasources": 2,
+        "rules": 1,
+        "cpu_limit": 0.5,
+        "health_database": "ok",
+        "oom": false
+      },
+      {
+        "action": "recreate",
+        "container_id": "4b38b5762ed0c0360639abb23e7107debcb4323c5008e6793e26c0314be84cfb",
+        "same_data_volume": true,
+        "existing_login": true,
+        "login_seconds": 0.019,
+        "live_query_seconds": 0.024,
+        "dashboards": 4,
+        "panels": 19,
+        "datasources": 2,
+        "rules": 1,
+        "cpu_limit": 1.0,
+        "health_database": "ok",
+        "oom": false
+      }
+    ],
+    "root_url": "http://localhost:3000/",
+    "port_binding": "127.0.0.1:3000",
+    "docker_boot_enabled": true,
+    "docker_active": true,
+    "no_reboot": true
+  },
+  "browser": {
+    "status": "PASS",
+    "scope": "Local Firefox: actual per-panel content/canvas,not only headers; screenshots after query completion. Windows/incognito separately confirmed by operator.",
+    "dashboards": [
+      {
+        "dashboard": "greenshop-application",
+        "panels_with_rendered_data": 5,
+        "query_or_asset_errors": false,
+        "ready_seconds": 3.91,
+        "refresh": "30s"
+      },
+      {
+        "dashboard": "greenshop-infrastructure",
+        "panels_with_rendered_data": 7,
+        "query_or_asset_errors": false,
+        "ready_seconds": 4.03,
+        "refresh": "30s"
+      },
+      {
+        "dashboard": "greenshop-logs",
+        "panels_with_rendered_data": 4,
+        "query_or_asset_errors": false,
+        "ready_seconds": 6.67,
+        "refresh": "30s"
+      },
+      {
+        "dashboard": "greenshop-security",
+        "panels_with_rendered_data": 3,
+        "query_or_asset_errors": false,
+        "ready_seconds": 6.44,
+        "refresh": "30s"
+      }
+    ]
+  },
+  "windows": "Operator confirmed normal and incognito login; post-change client reload recommended",
+  "website_read_only": {
+    "status": "PASS",
+    "scope": "Existing fixture logins and read-only catalog/cart/order/Admin pages only; no product/category/order/account create/update/delete",
+    "results": {
+      "customer": {
+        "existing_login": true,
+        "secure_session_cookie": true,
+        "read_only_pages": [
+          {
+            "path": "/SanPham/CuaHang",
+            "status": 200
+          },
+          {
+            "path": "/GioHang/QuanLyGioHang",
+            "status": 200
+          },
+          {
+            "path": "/ThanhToan/DonHangCuaToi",
+            "status": 200
+          }
+        ]
+      },
+      "admin": {
+        "existing_login": true,
+        "secure_session_cookie": true,
+        "read_only_pages": [
+          {
+            "path": "/Admin/SanPham/QuanLySanPham",
+            "status": 200
+          },
+          {
+            "path": "/Admin/DanhMuc/QuanLyDanhMuc",
+            "status": 200
+          },
+          {
+            "path": "/Admin/DonHang/QuanLyDonHang",
+            "status": 200
+          }
+        ]
+      }
+    },
+    "fresh404": true
+  },
+  "promql": {
+    "up": [
+      {
+        "metric": {
+          "__name__": "up",
+          "instance": "mysql-exporter:9104",
+          "job": "mysql"
+        },
+        "value": [
+          1792804521.305,
+          "1"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "up",
+          "instance": "prometheus:9090",
+          "job": "prometheus"
+        },
+        "value": [
+          1792804521.305,
+          "1"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "up",
+          "instance": "web_app:8080",
+          "job": "greenshop"
+        },
+        "value": [
+          1792804521.305,
+          "1"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "up",
+          "instance": "nginx-exporter:9113",
+          "job": "nginx"
+        },
+        "value": [
+          1792804521.305,
+          "1"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "up",
+          "instance": "cadvisor:8080",
+          "job": "cadvisor"
+        },
+        "value": [
+          1792804521.305,
+          "1"
+        ]
+      }
+    ],
+    "up{job=\"greenshop\"}": [
+      {
+        "metric": {
+          "__name__": "up",
+          "instance": "web_app:8080",
+          "job": "greenshop"
+        },
+        "value": [
+          1792804521.307,
+          "1"
+        ]
+      }
+    ],
+    "mysql_up": [
+      {
+        "metric": {
+          "__name__": "mysql_up",
+          "instance": "mysql-exporter:9104",
+          "job": "mysql"
+        },
+        "value": [
+          1792804521.31,
+          "1"
+        ]
+      }
+    ],
+    "nginx_up": [
+      {
+        "metric": {
+          "__name__": "nginx_up",
+          "instance": "nginx-exporter:9113",
+          "job": "nginx"
+        },
+        "value": [
+          1792804521.313,
+          "1"
+        ]
+      }
+    ]
+  },
+  "metric_panels": [
+    {
+      "dashboard": "greenshop-security",
+      "panel": "Failed Login Attempts — Last 1 Minute (exact process window)",
+      "actual_series": 1
+    },
+    {
+      "dashboard": "greenshop-security",
+      "panel": "Authorization Denied Events",
+      "actual_series": 1
+    },
+    {
+      "dashboard": "greenshop-security",
+      "panel": "Security Condition — GS-SEC-001",
+      "actual_series": 1
+    },
+    {
+      "dashboard": "greenshop-infrastructure",
+      "panel": "Overall Service Status",
+      "actual_series": 5
+    },
+    {
+      "dashboard": "greenshop-infrastructure",
+      "panel": "Container CPU Usage",
+      "actual_series": 12
+    },
+    {
+      "dashboard": "greenshop-infrastructure",
+      "panel": "Container Memory Usage",
+      "actual_series": 12
+    },
+    {
+      "dashboard": "greenshop-infrastructure",
+      "panel": "Container Network Traffic",
+      "actual_series": 12
+    },
+    {
+      "dashboard": "greenshop-infrastructure",
+      "panel": "Nginx Connections",
+      "actual_series": 1
+    },
+    {
+      "dashboard": "greenshop-infrastructure",
+      "panel": "MySQL Availability",
+      "actual_series": 1
+    },
+    {
+      "dashboard": "greenshop-infrastructure",
+      "panel": "MySQL Connections",
+      "actual_series": 1
+    },
+    {
+      "dashboard": "greenshop-application",
+      "panel": "Application Availability",
+      "actual_series": 1
+    },
+    {
+      "dashboard": "greenshop-application",
+      "panel": "HTTP Requests Per Second",
+      "actual_series": 1
+    },
+    {
+      "dashboard": "greenshop-application",
+      "panel": "HTTP Response Duration P95",
+      "actual_series": 1
+    },
+    {
+      "dashboard": "greenshop-application",
+      "panel": "HTTP Error Rate (4xx + 5xx)",
+      "actual_series": 1
+    },
+    {
+      "dashboard": "greenshop-application",
+      "panel": "Request Distribution by Safe Group",
+      "actual_series": 5
+    }
+  ],
+  "dashboard_panel_count": 19,
+  "alert_rules": 1,
+  "logql": {
+    "nginx": {
+      "query": "{environment=\"main\",service=\"nginx\",job=\"greenshop\"}",
+      "entries": 500,
+      "fresh_this_run": true,
+      "latest_timestamp_ns": "1792804516017351505"
+    },
+    "http_errors": {
+      "query": "{environment=\"main\",service=\"nginx\",job=\"greenshop\"} | json | status >= 400 | __error__=\"\"",
+      "entries": 6,
+      "fresh_this_run": true,
+      "latest_timestamp_ns": "1792803935238852627"
+    },
+    "failed_login": {
+      "query": "{environment=\"main\",service=\"greenshop-web\",job=\"greenshop\"} | json | event=\"auth.login.failed\" | __error__=\"\"",
+      "entries": 5,
+      "fresh_this_run": true,
+      "latest_timestamp_ns": "1792803961484174213"
+    },
+    "mysql_operational": {
+      "query": "{environment=\"main\",service=\"mysql\",job=\"greenshop\"}",
+      "entries": 2,
+      "fresh_this_run": false,
+      "latest_timestamp_ns": "1792761067141318572"
+    }
+  },
+  "security_incident": {
+    "four": "Normal",
+    "five": "Firing",
+    "correlated_loki_events": 5,
+    "firing_received_at": "2026-10-24T01:06:10.847434+00:00",
+    "resolved_received_at": "2026-10-24T01:06:50.158685+00:00",
+    "existing_fixture_usable_after": true
+  },
+  "headers": {
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "SAMEORIGIN",
+    "Referrer-Policy": "strict-origin-when-cross-origin"
+  },
+  "cleanup": {
+    "tests_legacy_files_deleted": 65,
+    "generated_obj_dirs_deleted": 2,
+    "active_setup_scripts": [
+      "bootstrap-db-user.sh",
+      "create-initial-admin.sh",
+      "generate-dev-cert.sh"
+    ],
+    "no_active_runtime_test_dependency": true
+  },
+  "git": {
+    "head_unchanged": true,
+    "index_unchanged": true,
+    "staged124_preserved": true,
+    "cached_diff_check": "PASS",
+    "working_diff_check": "PASS",
+    "commits_existing": 2,
+    "commit3": "PENDING_OPERATOR_REVIEW_STAGE_COMMIT; no commit/push performed"
+  },
+  "limits": [
+    "No physical VMware reboot; Docker/containerd enabled and controlled restarts tested.",
+    "No new business-write tests to honor frozen data. Existing website,logins,cart/orders/Admin reads checked.",
+    "MySQL operational records are existing24h logs; no DB fault/settings change made to manufacture new events.",
+    "Self-signed TLS,root masters,cAdvisor host/socket and schema DDL retained; UDP logging has loss window.",
+    "Prior Windows Loading cache/cookie cause is unproven; measured Grafana CPU saturation and fast-polling load addressed."
+  ],
+  "final_review": {
+    "all12_services_running": true,
+    "grafana_health_database": "ok",
+    "grafana_recent15m_error_lines": 0,
+    "grafana_oom": false,
+    "prometheus_targets_up": "5/5",
+    "docker_enabled_active": true,
+    "containerd_enabled": true,
+    "source_links": "PASS",
+    "exact_secret_value_scan": {
+      "working_files": 245,
+      "index_files": 427,
+      "findings": 0
+    },
+    "cached_diff_check": "PASS",
+    "working_diff_check": "PASS",
+    "old_workspace_head_index_unchanged": true,
+    "temporary_browser_session_closed": true
+  },
+  "snapshot_scope": "Historical BASIC acceptance captured before final M3 commit; Git/data references describe capture time, not live state."
+}

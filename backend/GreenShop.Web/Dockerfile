@@ -15,6 +15,9 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0@sha256:1601380775673021a23ea5985669f1da
 WORKDIR /app
 COPY --from=publish /app/publish .
 
+RUN mkdir -p /app/keys /app/wwwroot/uploads/products && chown app:app /app/keys /app/wwwroot/uploads/products
+USER app
+
 # Mở cổng web bên trong container
 EXPOSE 8080
 ENV ASPNETCORE_URLS=http://+:8080
